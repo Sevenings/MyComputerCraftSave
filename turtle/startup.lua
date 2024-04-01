@@ -1,6 +1,10 @@
 tp = require("tuplus")
 
-tp.orientate()
+if tp.canGpsOrientate() then
+    tp.orientate()
+else
+    tp.orientate("manual")
+end
 local pos = tp.getPosition()
 local fac = tp.getFacing()
 print("Self Position: " .. pos:tostring())

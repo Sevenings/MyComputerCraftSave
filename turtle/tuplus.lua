@@ -200,6 +200,15 @@ local function orientatePosition(option)
 end
 
 
+local function canGpsOrientate()
+    local modem = peripheral.find("modem")
+    if modem and gps.locate() then
+        return true
+    end
+    return false
+end
+
+
 --To orientate
 local function orientate(option)
     orientateFacing(option)
@@ -491,6 +500,7 @@ return {
     gpsFindPosition = gpsFindPosition,
     orientatePosition = orientatePosition,
     orientate = orientate,
+    canGpsOrientate = canGpsOrientate,
 
     facingDistance = facingDistance,
     turnRight = turnRight,
