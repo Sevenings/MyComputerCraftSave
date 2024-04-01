@@ -1,8 +1,10 @@
 --[[
-    Tuplus v0.2
     Sevening_
     Turtle Plus eh um modulo para melhores funcoes de controle sobre as turtles.
 ]]
+
+
+ioutils = require "ioutils"
 
 
 --Directional Functions
@@ -103,6 +105,7 @@ local function facingToNum(facing)
     elseif facing == "s" then return SOUTH
     elseif facing == "e" then return EAST
     elseif facing == "n" then return NORTH
+    else return false
     end
 end
 
@@ -132,8 +135,7 @@ end
 --Orientation
 --Facing orientation
 local function askForDirection()
-    print("Digite a direção: [n, s, e, w]")
-    local facing = facingToNum(read())
+    local facing = ioutils.askFor(facingToNum, "Set the direction: [n, s, e, w]", "Not a valid direction...")
     return facing
 end
 
@@ -171,12 +173,9 @@ end
 
 --Position orientation
 local function askForPosition()
-    print("Digite X:")
-    local x = tonumber(read())
-    print("Digite Y:")
-    local y = tonumber(read())
-    print("Digite Z:")
-    local z = tonumber(read())
+    local x = ioutils.askFor(tonumber, "Set X:", "Not a number...")
+    local y = ioutils.askFor(tonumber, "Set Y:", "Not a number...")
+    local z = ioutils.askFor(tonumber, "Set Z:", "Not a number...")
     local position = vector.new(x, y, z)
     return position
 end

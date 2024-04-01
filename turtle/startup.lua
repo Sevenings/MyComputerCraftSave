@@ -1,11 +1,13 @@
+ts = require("turtleSettings")
 tp = require("tuplus")
 
-if tp.canGpsOrientate() then
-    tp.orientate()
-else
-    tp.orientate("manual")
+
+pref = ts.getPreferences()
+
+if pref.orientateOnStartup == true then
+    if tp.canGpsOrientate() then
+        shell.run("orientate")
+    else 
+        shell.run("orientate -m")
+    end
 end
-local pos = tp.getPosition()
-local fac = tp.getFacing()
-print("Self Position: " .. pos:tostring())
-print("Self Facing: " .. tp.facingToString(fac))
