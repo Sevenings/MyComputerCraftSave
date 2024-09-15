@@ -462,7 +462,7 @@ end
 
 
 -- Remove um caminho da lista de caminhos
-local function encerrarCaminho(nome)
+local function deletarCaminho(nome)
     Caminhos[nome] = nil
 end
 
@@ -498,6 +498,12 @@ local function desfazerCaminho(nome)
         print(movimento)
         DICT_MOVIMENTO_R[movimento]()
     end
+end
+
+
+-- Limpa o registro de um caminho sem deleta-lo
+local function limparCaminho(nome)
+    Caminhos[nome].movimentos = {}
 end
 
 
@@ -592,17 +598,6 @@ local function placeUp()
     return true
 end
 
-function testeDesfazerCaminho()
-    comecarCaminho('canto')
-    forward()
-    forward()
-    forward()
-    turnRight()
-    forward()
-    sleep(2)
-    desativarCaminho('canto')
-    desfazerCaminho('canto')
-end
 
 return {
     facingToString = facingToString,
@@ -652,12 +647,13 @@ return {
 
     getCaminho = getCaminho,
     comecarCaminho = comecarCaminho,
-    encerrarCaminho = encerrarCaminho,
+    deletarCaminho = deletarCaminho,
     ativarCaminho = ativarCaminho,
     desativarCaminho = desativarCaminho,
     registrarMovimento = registrarMovimento,
     percorrerCaminho = percorrerCaminho,
     desfazerCaminho = desfazerCaminho,
+    limparCaminho = limparCaminho,
 
     search = search,
     searchNotEmptySlot = searchNotEmptySlot,
