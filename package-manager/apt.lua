@@ -5,7 +5,7 @@ local repository = 'https://raw.githubusercontent.com/Sevenings/MyComputerCraftS
 -- apt get <package>
 if command == 'get' then
     local pkg = arg[2]
-    shell.run('wget', repository+pkg)
+    shell.run('wget', repository..pkg..'.lua')
 
 -- apt update
 elseif command == 'update' then
