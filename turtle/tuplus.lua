@@ -7,7 +7,7 @@
 local ioutils = require "ioutils"
 
 
--- Funções para salvar caminhos
+-- Funcoes para salvar caminhos
 Caminhos = {}
 
 
@@ -20,37 +20,92 @@ local MOVIMENTO = {
     RIGHT = 'r'
 }
 
+-- Declaracoes iniciais
+local up = nil
+local down = nil
+local forward = nil
+local back = nil
+local turnLeft = nil
+local turnRight = nil
 
+
+-- Dicionario movimento para funcao
+local DICT_MOVIMENTO = {
+    [MOVIMENTO.UP] = up,
+    [MOVIMENTO.DOWN] = down,
+    [MOVIMENTO.FORWARD] = forward,
+    [MOVIMENTO.BACK] = back,
+    [MOVIMENTO.LEFT] = turnLeft,
+    [MOVIMENTO.RIGHT] = turnRight,
+}
+
+
+-- Dicionario movimento para funcao reverso
+local DICT_MOVIMENTO_R = {
+    [MOVIMENTO.UP] = down,
+    [MOVIMENTO.DOWN] = up,
+    [MOVIMENTO.FORWARD] = back,
+    [MOVIMENTO.BACK] = forward,
+    [MOVIMENTO.LEFT] = turnRight,
+    [MOVIMENTO.RIGHT] = turnLeft,
+}
+
+
+-- Retorna o caminho com certo nome
 local function getCaminho(nome)
     return Caminhos[nome]
 end
 
 
+-- Cria um caminho novo na lista de caminhos
+-- Caminhos sao ativos por padrao
 local function comecarCaminho(nome)
     Caminhos[nome] = {ativo = true, movimentos = {}}
 end
 
 
+-- Remove um caminho da lista de caminhos
 local function encerrarCaminho(nome)
     Caminhos[nome] = nil
 end
 
 
+-- Ativa um caminho para poder ser atualizado
 local function ativarCaminho(nome)
     Caminhos[nome].ativo = true
 end
 
 
+-- Desativa um caminho, para que nao possa ser alterado
 local function desativarCaminho(nome)
     Caminhos[nome].ativo = false
 end
 
 
+-- Adiciona um movimento a todos os caminhos ate entao registrados
 local function registrarMovimento(movimento)
     for _, caminho in pairs(Caminhos) do
         if caminho.ativo then
-            table.insert(caminho, movimento)
+            table.insert(caminho.movimentos, movimento)
         end
+    end
+end
+
+
+-- Percorre um caminho
+local function percorrerCaminho(nome)
+    local caminho = getCaminho(nome)
+    for _, movimento in ipairs(caminho.movimentos) do
+        DICT_MOVIMENTO[movimento]()
+    end
+end
+
+
+-- Percorre um caminho de tras para frente
+local function desfazerCaminho(nome)
+    local caminho = getCaminho(nome)
+    for _, movimento in ipairs(caminho.movimentos) do
+        DICT_MOVIMENTO_R[movimento]()
     end
 end
 
@@ -371,6 +426,9 @@ local function down()
 	end
     return moved
 end
+
+
+
 
 
 local function walkTo(destination)
