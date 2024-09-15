@@ -97,9 +97,11 @@ end
 -- Atualiza os pacotes que já foram instalados
 local function atualizarPacotes()
     local catalogo = getCatalogo()
-    for pacote, _ in pairs(catalogo) do
-        removerPacote(pacote)
-        adicionarPacote(pacote)
+    for pacote, instalado in pairs(catalogo) do
+        if instalado then
+            removerPacote(pacote)
+            adicionarPacote(pacote)
+        end
     end
 end
 
