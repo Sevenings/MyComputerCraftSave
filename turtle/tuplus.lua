@@ -42,12 +42,12 @@ local DICT_MOVIMENTO = {
 
 -- Dicionario movimento para funcao reverso
 local DICT_MOVIMENTO_R = {
-    [MOVIMENTO.UP] = down,
-    [MOVIMENTO.DOWN] = up,
-    [MOVIMENTO.FORWARD] = back,
-    [MOVIMENTO.BACK] = forward,
-    [MOVIMENTO.LEFT] = turnRight,
-    [MOVIMENTO.RIGHT] = turnLeft,
+    ['u'] = down,
+    ['d'] = up,
+    ['f'] = back,
+    ['b'] = forward,
+    ['l'] = turnRight,
+    ['r'] = turnLeft,
 }
 
 
@@ -105,8 +105,9 @@ end
 -- Percorre um caminho de tras para frente
 local function desfazerCaminho(nome)
     local caminho = getCaminho(nome)
-    for k, movimento in pairs(caminho.movimentos) do
-        print(k, movimento)
+    local movimentos = caminho.movimentos
+    for i = #movimentos, 1, -1 do
+        local movimento = movimentos[i]
         DICT_MOVIMENTO_R[movimento]()
     end
 end
