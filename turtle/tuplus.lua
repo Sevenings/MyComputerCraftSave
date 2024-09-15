@@ -555,7 +555,7 @@ end
 -- Verifica se inventario esta cheio 
 local function inventarioCheio()
     local selected_slot = turtle.getSelectedSlot()
-    for s=1, 16 do
+    for s=16, 1, -1 do
         turtle.select(s)
         if turtle.getItemCount() == 0 then
             turtle.select(selected_slot)
@@ -575,6 +575,27 @@ local function esvaziarInventario()
         turtle.drop()
     end
     turtle.select(selected_slot)
+end
+
+
+-- Inspeciona para ver se o bloco da frente eh o desejado
+local function isBlock(block_name)
+    local _, block = turtle.inspect()
+    return block.name == block_name
+end
+
+
+-- Inspeciona para ver se o bloco de cima eh o desejado
+local function isBlockUp(block_name)
+    local _, block = turtle.inspectUp()
+    return block.name == block_name
+end
+
+
+-- Inspeciona para ver se o bloco de baixo eh o desejado
+local function isBlockDown(block_name)
+    local _, block = turtle.inspectDown()
+    return block.name == block_name
 end
 
 
@@ -711,6 +732,9 @@ return {
     searchNotEmptySlot = searchNotEmptySlot,
     inventarioCheio = inventarioCheio,
     esvaziarInventario = esvaziarInventario,
+    isBlock = isBlock,
+    isBlockUp = isBlockUp,
+    isBlockDown = isBlockDown,
 
     distanceToMe = distanceToMe,
     closestPos = closestPos,

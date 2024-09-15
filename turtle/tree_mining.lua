@@ -1,7 +1,7 @@
 local tp = require('tuplus')
 
 local function backup()
-    print('Fazendo backup')
+    print('Fazendo backup.')
 
     -- Tenha certeza que o checkpoint ainda não existe
     if tp.getCaminho('checkpoint') then
@@ -16,35 +16,43 @@ local function backup()
 
     -- Chegando lá, se o combustivel for pouco, reabastece
     if turtle.getFuelLevel() <= 16 then
-        print('Reabastecendo')
+        print('Reabastecendo.')
         tp.refuelAll()
     end
 
     -- Esvazia inventario
-    print('Esvaziando Inventario')
+    print('Esvaziando Inventario.')
     tp.turnLeft()
     tp.esvaziarInventario()
     tp.turnRight()
 
     -- Volta
-    print('Voltando ao checkpoint')
+    print('Voltando ao checkpoint.')
     tp.ativarCaminho('bau')
     tp.limparCaminho('bau')
     tp.desativarCaminho('checkpoint')
     tp.desfazerCaminho('checkpoint')
 end
 
+-- Primeira coisa reabastecer
+print('Reabastecendo.')
+tp.refuelAll()
 
 -- setup colocar o bau
-tp.search('quark:oak_chest')
 tp.turnLeft()
-tp.tryDig()
-tp.place()
+if not tp.isBlock('quark:oak_chest') then
+    print('Nao ha bau. Colocando...')
+    tp.search('quark:oak_chest')
+    tp.tryDig()
+    tp.place()
 
-tp.tryDigUp()
-tp.up()
-tp.tryDig()
-tp.down()
+    tp.tryDigUp()
+    tp.up()
+    tp.tryDig()
+    tp.down()
+else 
+    print('Bau detectado.')
+end
 
 tp.turnRight()
 tp.tryDig()
@@ -105,3 +113,8 @@ end
 print('Terminando viagem')
 tp.desativarCaminho('bau')
 tp.desfazerCaminho('bau')
+
+-- Esvazia o inventario
+tp.turnLeft()
+tp.esvaziarInventario()
+tp.turnRight()
