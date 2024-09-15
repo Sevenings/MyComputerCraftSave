@@ -102,6 +102,11 @@ while not completo do
         backup()
     end
 
+
+    -- Verifica se encontrou algum mineral raro e realiza o vein mining
+    -- quem dera... talvez no futuro
+
+    -- Da um passo para frente
     tp.forward()
     p = p + 1
     if p >= profundidade then
