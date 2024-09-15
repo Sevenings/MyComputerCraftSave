@@ -95,7 +95,7 @@ end
 -- Percorre um caminho
 local function percorrerCaminho(nome)
     local caminho = getCaminho(nome)
-    for _, movimento in ipairs(caminho.movimentos) do
+    for _, movimento in pairs(caminho.movimentos) do
         DICT_MOVIMENTO[movimento]()
     end
 end
@@ -104,7 +104,7 @@ end
 -- Percorre um caminho de tras para frente
 local function desfazerCaminho(nome)
     local caminho = getCaminho(nome)
-    for _, movimento in ipairs(caminho.movimentos) do
+    for _, movimento in pairs(caminho.movimentos) do
         DICT_MOVIMENTO_R[movimento]()
     end
 end
