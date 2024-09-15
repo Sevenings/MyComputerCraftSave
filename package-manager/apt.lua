@@ -8,14 +8,11 @@ local function catalogoExiste()
 end
 
 
--- Cria um novo arquivo de catalogo em branco
-local function criarCatalogo()
-    if catalogoExiste() then return end
-    local catalogo_file = fs.open(PATH_CATALOGO, 'w')
-    local catalogo_table = {pacotes = {}}
-    catalogo_file:write(textutils.serialize(catalogo_table))
-    catalogo_file:flush()
-    catalogo_file:close()
+-- Salva um objeto de catalogo no arquivo de catalogo
+local function setCatalogo(catalogo)
+    local file = fs.open(PATH_CATALOGO, 'w')
+    file.write(textutils.serialize(catalogo))
+    file:close()
 end
 
 
@@ -28,11 +25,11 @@ local function getCatalogo()
 end
 
 
--- Salva um objeto de catalogo no arquivo de catalogo
-local function setCatalogo(catalogo)
-    local file = fs.open(PATH_CATALOGO, 'w')
-    file:write(textutils.serialize(catalogo))
-    file:close()
+-- Cria um novo arquivo de catalogo em branco
+local function criarCatalogo()
+    if catalogoExiste() then return end
+    local catalogo_table = {}
+    setCatalogo(catalogo_table)
 end
 
 
@@ -58,7 +55,7 @@ end
 local function estaNoCatalogo(pacote)
     if not catalogoExiste() then return end
     local catalogo = getCatalogo()
-    if catalogo.pacotes[pacote] then
+    if catalogo[pacote] then
         return true
     end
     return false
@@ -84,7 +81,8 @@ local function removerPacote(pacote)
         print('Pacote não encontrado')
         return
     end
-    shell.run('rm', pacote)
+    shell.run('rm', pacote..'.lua')
+    removerDoCatalogo(pacote)
 end
 
 
@@ -113,6 +111,8 @@ elseif command == 'update' then
 
 -- apt remove <package>
 elseif command == 'remove' then
+    local pacote = arg[2]
+    removerPacote(pacote)
 
 
 -- apt list 
@@ -121,6 +121,8 @@ elseif command == 'list' then
 
 -- apt search <package>
 elseif command == 'search' then
+    local pacote = arg[2]
+    print(estaNoCatalogo(pacote))
 
 
 -- help
