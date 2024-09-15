@@ -303,7 +303,7 @@ local function back()
 	end
     return moved
 end
-	
+
 
 local function up()
     local moved = turtle.up()
@@ -325,9 +325,6 @@ local function down()
 	end
     return moved
 end
-
-
-
 
 
 local function walkTo(destination)
@@ -494,6 +491,7 @@ local function desfazerCaminho(nome)
     local movimentos = caminho.movimentos
     for i = #movimentos, 1, -1 do
         local movimento = movimentos[i]
+        print(movimento)
         DICT_MOVIMENTO_R[movimento]()
     end
 end
@@ -603,15 +601,6 @@ function testeDesfazerCaminho()
 end
 
 return {
-    getCaminho = getCaminho,
-    comecarCaminho = comecarCaminho,
-    encerrarCaminho = encerrarCaminho,
-    ativarCaminho = ativarCaminho,
-    desativarCaminho = desativarCaminho,
-    registrarMovimento = registrarMovimento,
-    percorrerCaminho = percorrerCaminho,
-    desfazerCaminho = desfazerCaminho,
-
     facingToString = facingToString,
     getFacing = getFacing,
     setFacing = setFacing,
@@ -656,6 +645,15 @@ return {
     backUntil = backUntil,
 
     smoothWalkTo = smoothWalkTo,
+
+    getCaminho = getCaminho,
+    comecarCaminho = comecarCaminho,
+    encerrarCaminho = encerrarCaminho,
+    ativarCaminho = ativarCaminho,
+    desativarCaminho = desativarCaminho,
+    registrarMovimento = registrarMovimento,
+    percorrerCaminho = percorrerCaminho,
+    desfazerCaminho = desfazerCaminho,
 
     search = search,
     searchNotEmptySlot = searchNotEmptySlot,
