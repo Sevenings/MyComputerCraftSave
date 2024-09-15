@@ -4,10 +4,21 @@
 ]]
 
 
+-- Imports
 local ioutils = require "ioutils"
 
 
 
+-- Constantes
+-- Enumeracao de Movimentos
+local MOVIMENTO = {
+    UP = 'u',
+    DOWN = 'd',
+    FORWARD = 'f',
+    BACK = 'b',
+    LEFT = 'l',
+    RIGHT = 'r'
+}
 
 
 --Directional Functions
@@ -401,15 +412,6 @@ end
 Caminhos = {}
 
 
--- Enumeracao de Movimentos
-local MOVIMENTO = {
-    UP = 'u',
-    DOWN = 'd',
-    FORWARD = 'f',
-    BACK = 'b',
-    LEFT = 'l',
-    RIGHT = 'r'
-}
 
 
 -- Dicionario movimento para funcao
