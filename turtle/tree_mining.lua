@@ -83,7 +83,11 @@ while not completo do
     local combustivel = turtle.getFuelLevel()
     local caminho_bau = tp.tamanhoCaminho('bau')
     print(string.format('Estado (%d)', p))
-    print(string.format('Inventario Cheio: %b', cheio))
+    if cheio then
+        print('Inventario Cheio: true')
+    else
+        print('Inventario Cheio: false')
+    end
     print(string.format('Combustivel: %d', combustivel))
     print(string.format('Caminho Bau: %d', caminho_bau))
     if cheio or caminho_bau + 16 >= combustivel then
