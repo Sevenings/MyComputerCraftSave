@@ -506,15 +506,36 @@ local function limparCaminho(nome)
     Caminhos[nome].movimentos = {}
 end
 
+-- Calcula o tamanho de um caminho
+local function tamanhoCaminho(nome)
+    local caminho = getCaminho(nome)
+    local movimentos = caminho.movimentos
+
+    local dict_gastos = {
+        [MOVIMENTO.UP] = 1,
+        [MOVIMENTO.DOWN] = 1,
+        [MOVIMENTO.FORWARD] = 1,
+        [MOVIMENTO.BACK] = 1,
+        [MOVIMENTO.LEFT] = 0,
+        [MOVIMENTO.RIGHT] = 0
+    }
+
+    local tamanho = 0
+    for _, m in pairs(movimentos) do
+        tamanho = tamanho + dict_gastos[m]
+    end
+    return tamanho
+end
+
 
 -- Funcoes de Inventario
 local function search(itemName)
     for slot=1, 16 do
         local item = turtle.getItemDetail(slot)
         if item then
-            if item.name == itemName then 
+            if item.name == itemName then
                 turtle.select(slot)
-                return true 
+                return true
             end
         end
     end
@@ -599,6 +620,12 @@ local function placeUp()
 end
 
 
+-- Funções de combustivel
+local function refuelAll()
+    shell.run('refuel', 'all')
+end
+
+
 return {
     facingToString = facingToString,
     getFacing = getFacing,
@@ -654,6 +681,7 @@ return {
     percorrerCaminho = percorrerCaminho,
     desfazerCaminho = desfazerCaminho,
     limparCaminho = limparCaminho,
+    tamanhoCaminho = tamanhoCaminho,
 
     search = search,
     searchNotEmptySlot = searchNotEmptySlot,
@@ -664,4 +692,6 @@ return {
     place = place,
     placeDown = placeDown,
     placeUp = placeUp,
+
+    refuelAll = refuelAll,
 }
