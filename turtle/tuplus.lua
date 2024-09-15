@@ -21,6 +21,18 @@ local MOVIMENTO = {
 }
 
 
+-- Adiciona um movimento a todos os caminhos ate entao registrados
+local function registrarMovimento(movimento)
+    for _, caminho in pairs(Caminhos) do
+        if caminho.ativo then
+            table.insert(caminho.movimentos, movimento)
+        end
+    end
+end
+
+
+
+
 --Directional Functions
 EAST = 0
 SOUTH = 1
@@ -464,16 +476,6 @@ end
 -- Desativa um caminho, para que nao possa ser alterado
 local function desativarCaminho(nome)
     Caminhos[nome].ativo = false
-end
-
-
--- Adiciona um movimento a todos os caminhos ate entao registrados
-local function registrarMovimento(movimento)
-    for _, caminho in pairs(Caminhos) do
-        if caminho.ativo then
-            table.insert(caminho.movimentos, movimento)
-        end
-    end
 end
 
 
