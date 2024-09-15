@@ -483,7 +483,6 @@ end
 local function percorrerCaminho(nome)
     local caminho = getCaminho(nome)
     for k, movimento in pairs(caminho.movimentos) do
-        print(k, movimento)
         DICT_MOVIMENTO[movimento]()
     end
 end
@@ -495,7 +494,6 @@ local function desfazerCaminho(nome)
     local movimentos = caminho.movimentos
     for i = #movimentos, 1, -1 do
         local movimento = movimentos[i]
-        print(movimento)
         DICT_MOVIMENTO_R[movimento]()
     end
 end
