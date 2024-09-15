@@ -42,15 +42,15 @@ for y=1, quant_camadas do   --Cavar para cima
         end
     end
 
+    -- Se o z for ímpar ele está na diagonal oposta
     if dimension.z%2 == 1 then    --Ajeita a orientação
         tp.turnLeft()
         tp.turnLeft()
-    else
+    else    -- Se o z for par ele está no lado oposto
         tp.turnRight()
-        for i=1, dimension.z-1 do
-            tp.forward()
-        end
-        tp.turnRight()
+        local aux = dimension.x
+        dimension.x = dimension.z
+        dimension.z = aux
     end 
     
     if y < quant_camadas then
