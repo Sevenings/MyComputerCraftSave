@@ -34,10 +34,6 @@ local function backup()
     tp.desfazerCaminho('checkpoint')
 end
 
--- Primeira coisa reabastecer
-print('Reabastecendo.')
-tp.refuelAll()
-
 -- setup colocar o bau
 tp.turnLeft()
 if not tp.isBlock('quark:oak_chest') then
@@ -50,9 +46,14 @@ if not tp.isBlock('quark:oak_chest') then
     tp.up()
     tp.tryDig()
     tp.down()
-else 
+else
     print('Bau detectado.')
 end
+
+-- Reabastecer
+print('Reabastecendo.')
+tp.refuelAll()
+
 
 tp.turnRight()
 tp.tryDig()
