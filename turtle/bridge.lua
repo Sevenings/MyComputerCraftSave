@@ -1,4 +1,4 @@
-require "tuplus"
+local tp = require "tuplus"
 
 local length = arg[1]
 if not length then
@@ -11,20 +11,20 @@ if not fazerCorrimao then
 end
 
 function buildCorrimao()
-    turnLeft()
-    place()
-    turnRight()
-    turnRight()
-    place()
-    turnLeft()
+    tp.turnLeft()
+    tp.place()
+    tp.turnRight()
+    tp.turnRight()
+    tp.place()
+    tp.turnLeft()
 end
 
 for i=1, length do
-    tryDig()
-    tryDigUp()
-    placeDown()
+    tp.tryDig()
+    tp.tryDigUp()
+    tp.placeDown()
     if fazerCorrimao then
         buildCorrimao()
     end
-    forward()
+    tp.forward()
 end

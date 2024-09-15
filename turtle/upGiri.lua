@@ -1,14 +1,14 @@
-require "tuplus"
+local tp = require "tuplus"
 
-initial_pos = getPosition()
+initial_pos = tp.getPosition()
 
 while not turtle.detectUp() do
     up()
 end
 
-savePosition()
+tp.savePosition()
 shell.run("minamoGiri.lua up")
-getPosition()
+tp.getPosition()
 
-walkTo(initial_pos)
-savePosition()
+tp.walkTo(initial_pos)
+tp.savePosition()

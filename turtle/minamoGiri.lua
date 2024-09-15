@@ -1,4 +1,4 @@
-require("tuplus")
+local tp = require("tuplus")
 
 local INITIAL_DIRECTION = arg[1]
 if INITIAL_DIRECTION == nil then
@@ -35,7 +35,7 @@ end
 function mapBlockForward()
 	local hasBlock, blockInfo = turtle.inspect()
 	if blockInfo.name == reference.name then
-		local block_pos = getPosition() + facingToVector(getFacing())
+		local block_pos = tp.getPosition() + tp.facingToVector(tp.getFacing())
 		map(block_pos)
 	end
 end
@@ -43,7 +43,7 @@ end
 function mapBlockUp()
 	local hasBlock, blockInfo = turtle.inspectUp()
 	if blockInfo.name == reference.name then
-		local block_pos = getPosition() + vector.new(0, 1, 0)
+		local block_pos = tp.getPosition() + vector.new(0, 1, 0)
         map(block_pos)
 	end
 end
@@ -51,7 +51,7 @@ end
 function mapBlockDown()
 	local hasBlock, blockInfo = turtle.inspectDown()
 	if blockInfo.name == reference.name then
-		local block_pos = getPosition() + vector.new(0, -1, 0)
+		local block_pos = tp.getPosition() + vector.new(0, -1, 0)
         map(block_pos)
 	end
 end
@@ -59,7 +59,7 @@ end
 function mapAround()
 	for i=1, 4 do
 		mapBlockForward()
-		turnRight()
+		tp.turnRight()
 	end
     mapBlockUp()
     mapBlockDown()
@@ -74,18 +74,18 @@ end
 
 local initial_pos = nil
 if RETURN_START then
-    initial_pos = getPosition()
+    initial_pos = tp.getPosition()
 end
 mapAround()
 while #found_blocks > 0 do
     table.sort(found_blocks, distanceToMe)
-    walkTo(found_blocks[#found_blocks])
+    tp.walkTo(found_blocks[#found_blocks])
     table.remove(found_blocks)
     mapAround()
 end
 
 if RETURN_START then
-    walkTo(initial_pos)
+    tp.walkTo(initial_pos)
 end
 
-savePosition()
+tp.savePosition()

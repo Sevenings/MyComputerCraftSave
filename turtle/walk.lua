@@ -1,4 +1,4 @@
-tp = require("tuplus")
+local tp = require("tuplus")
 
 if #arg < 1 then
     return
