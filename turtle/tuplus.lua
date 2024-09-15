@@ -95,7 +95,8 @@ end
 -- Percorre um caminho
 local function percorrerCaminho(nome)
     local caminho = getCaminho(nome)
-    for _, movimento in pairs(caminho.movimentos) do
+    for k, movimento in pairs(caminho.movimentos) do
+        print(k, movimento)
         DICT_MOVIMENTO[movimento]()
     end
 end
@@ -104,7 +105,8 @@ end
 -- Percorre um caminho de tras para frente
 local function desfazerCaminho(nome)
     local caminho = getCaminho(nome)
-    for _, movimento in pairs(caminho.movimentos) do
+    for k, movimento in pairs(caminho.movimentos) do
+        print(k, movimento)
         DICT_MOVIMENTO_R[movimento]()
     end
 end
@@ -589,6 +591,17 @@ local function placeUp()
     return true
 end
 
+function testeDesfazerCaminho()
+    comecarCaminho('canto')
+    forward()
+    forward()
+    forward()
+    turnRight()
+    forward()
+    sleep(2)
+    desativarCaminho('canto')
+    desfazerCaminho('canto')
+end
 
 return {
     getCaminho = getCaminho,
