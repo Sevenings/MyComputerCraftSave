@@ -46,6 +46,20 @@ if not tp.isBlock('quark:oak_chest') then
     tp.up()
     tp.tryDig()
     tp.down()
+
+    tp.turnRight()
+    tp.tryDig()
+    tp.forward()
+    tp.turnLeft()
+
+    tp.tryDig()
+    tp.place()
+    tp.tryDigUp()
+    tp.up()
+    tp.tryDig()
+    tp.down()
+
+    tp.turnRight()
 else
     print('Bau detectado.')
 end
@@ -55,19 +69,6 @@ print('Reabastecendo.')
 tp.refuelAll()
 
 
-tp.turnRight()
-tp.tryDig()
-tp.forward()
-tp.turnLeft()
-
-tp.tryDig()
-tp.place()
-tp.tryDigUp()
-tp.up()
-tp.tryDig()
-tp.down()
-
-tp.turnRight()
 
 -- Salvar um caminho de volta para o bau
 tp.comecarCaminho('bau')
