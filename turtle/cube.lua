@@ -1,12 +1,12 @@
-require "tuplus"
+local tp = require "tuplus"
 
 local dimension = vector.new(arg[1], arg[2], arg[3])
 
 for y=1, dimension.y do   --Cavar para cima
     for z=1, dimension.z do   --Cavar para a direita
         for x=1, dimension.x-1 do   --Cavar para frente
-            tryDig()
-            forward()
+            tp.tryDig()
+            tp.forward()
         end
 
         if z == dimension.z then
@@ -14,31 +14,31 @@ for y=1, dimension.y do   --Cavar para cima
         end
 
         if z%2 == 1 then    --Curva para direita
-            turnRight()
-            tryDig()
-            forward()
-            turnRight()
+            tp.turnRight()
+            tp.tryDig()
+            tp.forward()
+            tp.turnRight()
         else
-            turtle.turnLeft()
-            tryDig()
-            forward()
-            turnLeft()
+            tp.turnLeft()
+            tp.tryDig()
+            tp.forward()
+            tp.turnLeft()
         end
     end
 
     if dimension.z%2 == 1 then    --Ajeita a orientação
-        turnLeft()
-        turnLeft()
+        tp.turnLeft()
+        tp.turnLeft()
     else
-        turnRight()
+        tp.turnRight()
         for i=1, dimension.z-1 do
-            forward()
+            tp.forward()
         end
-        turnRight()
-    end 
+        tp.turnRight()
+    end
 
     if y == dimension.y then break end
 
-    tryDigUp()
-    up()
+    tp.tryDigUp()
+    tp.up()
 end
