@@ -81,24 +81,24 @@ function new_table(name, columns_names, columns_types)
 
     -- Método addItem
     local function addItem (...)
-        local arg = ...
-        local table_controller = arg[1]
+        local argumento = {...}
+        local table_controller = argumento[1]
 
         -- Gera um item de acordo com o nome das colunas
         local function makeItem(arg_list)
             print(#arg_list)
             print(#columns_names)
-            assert(#arg_list == #columns_names)
+            assert(#arg_list == #columns_names + 1) -- +1 pelo self:method()
 
             local item = {}
-            for i=1, #arg_list do
-                item[columns_names[i]] = arg_list[i]
+            for i=1, #columns_names do
+                item[columns_names[i]] = arg_list[i+1] -- O primeiro argumento é um self
             end
             return item
         end
 
-        print("Numero de Arg: "..#arg)
-        local item = makeItem(arg)
+        print("Numero de Arg: "..#argumento)
+        local item = makeItem(argumento)
 
         for i=1, #columns_names do
             assert(item[columns_names[i]] ~= nil)
@@ -145,28 +145,17 @@ function new_table(name, columns_names, columns_types)
 end
 
 
+-- Teste
+-- Cria uma tabela de plantas
 plantas = new_table(
-    "plantas", 
+    "plantas",
     {"id", "nome", "especie", "data_plantio"},
     {NUMBER_TYPE, STRING_TYPE, STRING_TYPE, STRING_TYPE}
 )
 
-function itemPlanta(id, nome, especie, data_plantio)
-    return {
-        id = id,
-        nome = nome,
-        especie = especie,
-        data_plantio = data_plantio
-    }
-end
-
-
-
 plantas:addItem(2, "Pequi", "Caryocar brasiliensis", "1954-03-13")
 plantas:save()
 
---[[ 
 -- Teste do getColumns 
 columns = plantas:getColumns()
 print(textutils.serialize(columns))
-]]
