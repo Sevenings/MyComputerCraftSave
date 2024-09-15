@@ -554,6 +554,32 @@ local function searchNotEmptySlot()
 end
 
 
+-- Verifica se inventario esta cheio 
+local function inventarioCheio()
+    local selected_slot = turtle.getSelectedSlot()
+    for s=1, 16 do
+        turtle.select(s)
+        if turtle.getItemCount() == 0 then
+            turtle.select(selected_slot)
+            return false
+        end
+    end
+    turtle.select(selected_slot)
+    return true
+end
+
+
+-- Esvazia o inventario dropando todos os itens
+local function esvaziarInventario()
+    local selected_slot = turtle.getSelectedSlot()
+    for s=1, 16 do
+        turtle.select(s)
+        turtle.drop()
+    end
+    turtle.select(selected_slot)
+end
+
+
 local function distanceToMe(final_pos)
     local diff_vector = final_pos - (getPosition() + vector.new(0.5, 0.5, 0.5))
     return diff_vector:length()
@@ -685,6 +711,8 @@ return {
 
     search = search,
     searchNotEmptySlot = searchNotEmptySlot,
+    inventarioCheio = inventarioCheio,
+    esvaziarInventario = esvaziarInventario,
 
     distanceToMe = distanceToMe,
     closestPos = closestPos,
