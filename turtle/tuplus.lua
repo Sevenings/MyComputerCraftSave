@@ -4,7 +4,56 @@
 ]]
 
 
-ioutils = require "ioutils"
+local ioutils = require "ioutils"
+
+
+-- Funções para salvar caminhos
+Caminhos = {}
+
+
+local MOVIMENTO = {
+    UP = 'u',
+    DOWN = 'd',
+    FORWARD = 'f',
+    BACK = 'b',
+    LEFT = 'l',
+    RIGHT = 'r'
+}
+
+
+local function getCaminho(nome)
+    return Caminhos[nome]
+end
+
+
+local function comecarCaminho(nome)
+    Caminhos[nome] = {ativo = true, movimentos = {}}
+end
+
+
+local function encerrarCaminho(nome)
+    Caminhos[nome] = nil
+end
+
+
+local function ativarCaminho(nome)
+    Caminhos[nome].ativo = true
+end
+
+
+local function desativarCaminho(nome)
+    Caminhos[nome].ativo = false
+end
+
+
+local function registrarMovimento(movimento)
+    for _, caminho in pairs(Caminhos) do
+        if caminho.ativo then
+            table.insert(caminho, movimento)
+        end
+    end
+end
+
 
 
 --Directional Functions
@@ -227,6 +276,7 @@ local function turnRight()
     facing = facing + 1
     facing = facing%4     --Matemática circular :3
     setFacing(facing)
+    registrarMovimento(MOVIMENTO.RIGHT)
 end
 
 
@@ -236,6 +286,7 @@ local function turnLeft()
     facing = facing - 1
     facing = facing%4     --Matemática de relógio XD
     setFacing(facing)
+    registrarMovimento(MOVIMENTO.LEFT)
 end
 
 
@@ -282,6 +333,7 @@ local function forward()
         local position = getPosition()
         local facing = getFacing()
 		setPosition(position + facingToVector(facing))
+        registrarMovimento(MOVIMENTO.FORWARD)
 	end
     return moved
 end
@@ -293,6 +345,7 @@ local function back()
         local position = getPosition()
         local facing = getFacing()
 		setPosition(position - facingToVector(facing))
+        registrarMovimento(MOVIMENTO.BACK)
 	end
     return moved
 end
@@ -303,6 +356,7 @@ local function up()
 	if moved then
         local position = getPosition()
 		setPosition(position + vector.new(0, 1, 0))
+        registrarMovimento(MOVIMENTO.UP)
 	end
     return moved
 end
@@ -313,6 +367,7 @@ local function down()
 	if moved then
         local position = getPosition()
 		setPosition(position + vector.new(0, -1, 0))
+        registrarMovimento(MOVIMENTO.DOWN)
 	end
     return moved
 end
@@ -478,6 +533,13 @@ end
 
 
 return {
+    getCaminho = getCaminho,
+    comecarCaminho = comecarCaminho,
+    encerrarCaminho = encerrarCaminho,
+    ativarCaminho = ativarCaminho,
+    desativarCaminho = desativarCaminho,
+    registrarMovimento = registrarMovimento,
+
     facingToString = facingToString,
     getFacing = getFacing,
     setFacing = setFacing,
