@@ -597,6 +597,8 @@ return {
     ativarCaminho = ativarCaminho,
     desativarCaminho = desativarCaminho,
     registrarMovimento = registrarMovimento,
+    percorrerCaminho = percorrerCaminho,
+    desfazerCaminho = desfazerCaminho,
 
     facingToString = facingToString,
     getFacing = getFacing,
