@@ -62,6 +62,12 @@ local function estaNoCatalogo(pacote)
 end
 
 
+-- Formata o nome do pacote para filtrar o nome do arquivo.lua
+local function formataNomePacote(pacote)
+    return string.gsub(pacote, '%a*/', '')
+end
+
+
 -- Adiciona um novo pacote ao sistema
 local function adicionarPacote(pacote)
     if not catalogoExiste() then return end
@@ -69,7 +75,8 @@ local function adicionarPacote(pacote)
         print('Pacote já está presente')
         return
     end
-    shell.run('wget', REPOSITORIO..pacote..'.lua', pacote..'.lua')
+    local pacote_path = formataNomePacote(pacote)
+    shell.run('wget', REPOSITORIO..pacote..'.lua', pacote_path..'.lua')
     adicionarAoCatalogo(pacote)
 end
 
@@ -81,8 +88,42 @@ local function removerPacote(pacote)
         print('Pacote não encontrado')
         return
     end
-    shell.run('rm', pacote..'.lua')
+    local pacote_path = formataNomePacote(pacote)
+    shell.run('rm', pacote_path..'.lua')
     removerDoCatalogo(pacote)
+end
+
+
+-- Atualiza os pacotes que já foram instalados
+local function atualizarPacotes()
+    local catalogo = getCatalogo()
+    for pacote, _ in pairs(catalogo) do
+        removerPacote(pacote)
+        adicionarPacote(pacote)
+    end
+end
+
+
+-- Lista os pacotes que estão instalados
+local function listarPacotes()
+    local catalogo = getCatalogo()
+    print("Pacotes instalados:")
+    for pacote, estaInstalado in pairs(catalogo) do
+        if estaInstalado then
+            print(string.format(" * %s", pacote))
+        end
+    end
+end
+
+
+-- help
+local function mostrarHelp()
+    print('Usos:')
+    print('  - apt get <package>')
+    print('  - apt update')
+    print('  - apt remove <package>')
+    print('  - apt list')
+    print('  - apt search <package>')
 end
 
 
@@ -107,6 +148,7 @@ if command == 'get' then
 
 -- apt update
 elseif command == 'update' then
+    atualizarPacotes()
 
 
 -- apt remove <package>
@@ -117,6 +159,7 @@ elseif command == 'remove' then
 
 -- apt list 
 elseif command == 'list' then
+    listarPacotes()
 
 
 -- apt search <package>
@@ -127,11 +170,6 @@ elseif command == 'search' then
 
 -- help
 else
-    print('Help:')
-    print('  - apt get <package>')
-    print('  - apt update')
-    print('  - apt remove <package>')
-    print('  - apt list')
-    print('  - apt search <package>')
+    mostrarHelp()
 end
 
