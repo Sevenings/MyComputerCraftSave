@@ -15,7 +15,7 @@ end
 
 while true do
 	local hasBlock, block = turtle.inspect()
-	if block.name == "minecraft.oak_log" then
+	if block.name == "minecraft:oak_log" then
 		treeCaptate()
 		turtle.place()
 	end
