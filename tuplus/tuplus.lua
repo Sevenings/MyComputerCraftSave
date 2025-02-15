@@ -24,7 +24,7 @@ local MOVIMENTO = {
 -- Adiciona um movimento a todos os caminhos ate entao registrados
 local function registrarMovimento(movimento)
     for _, caminho in pairs(Caminhos) do
-        if caminho.ativo then
+        if caminho.gravando then
             table.insert(caminho.movimentos, movimento)
         end
     end
@@ -247,7 +247,7 @@ end
 
 
 -- Funções para rotacionar
-local function turnRight() 
+local function turnRight()
     turtle.turnRight()
     local facing = getFacing()
     facing = facing + 1
@@ -424,8 +424,6 @@ end
 Caminhos = {}
 
 
-
-
 -- Dicionario movimento para funcao
 local DICT_MOVIMENTO = {
     [MOVIMENTO.UP] = up,
@@ -449,39 +447,62 @@ local DICT_MOVIMENTO_R = {
 
 
 -- Retorna o caminho com certo nome
-local function getCaminho(nome)
-    return Caminhos[nome]
+local function getCaminho(nome_caminho)
+    return Caminhos[nome_caminho]
+end
+
+
+-- Retorna a lista de movimentos de um caminho
+local function getMovimentos(nome_caminho)
+    local caminho = getCaminho(nome_caminho)
+    return caminho.movimentos
 end
 
 
 -- Cria um caminho novo na lista de caminhos
 -- Caminhos sao ativos por padrao
-local function comecarCaminho(nome)
-    Caminhos[nome] = {ativo = true, movimentos = {}}
-end
+local function novoCaminho(nome)
+    Caminhos[nome] = {
+        -- Lista de movimentos do caminho
+        movimentos = {},
 
+        -- Variável que define se estamos 
+        -- gravando os movimentos realizados 
+        -- neste caminho
+        gravando = false,
+    }
+end
 
 -- Remove um caminho da lista de caminhos
-local function deletarCaminho(nome)
-    Caminhos[nome] = nil
+local function deletarCaminho(nome_caminho)
+    Caminhos[nome_caminho] = nil
 end
 
 
--- Ativa um caminho para poder ser atualizado
-local function ativarCaminho(nome)
-    Caminhos[nome].ativo = true
+-- Verifica se um caminho existe
+local function existeCaminho(nome_caminho)
+    return Caminhos[nome_caminho] ~= nil
 end
 
 
--- Desativa um caminho, para que nao possa ser alterado
-local function desativarCaminho(nome)
-    Caminhos[nome].ativo = false
+-- Inicia a gravação de um caminho para poder ser atualizado
+local function iniciarGravacaoCaminho(nome_caminho)
+    if not existeCaminho(nome_caminho) then
+        novoCaminho(nome_caminho)
+    end
+    Caminhos[nome_caminho].gravando = true
+end
+
+
+-- Encerra a gravação de um caminho, para que nao possa ser alterado
+local function pararGravacaoCaminho(nome_caminho)
+    Caminhos[nome_caminho].gravando = false
 end
 
 
 -- Percorre um caminho
-local function percorrerCaminho(nome)
-    local caminho = getCaminho(nome)
+local function percorrerCaminho(nome_caminho)
+    local caminho = getCaminho(nome_caminho)
     for k, movimento in pairs(caminho.movimentos) do
         DICT_MOVIMENTO[movimento]()
     end
@@ -489,8 +510,8 @@ end
 
 
 -- Percorre um caminho de tras para frente
-local function desfazerCaminho(nome)
-    local caminho = getCaminho(nome)
+local function desfazerCaminho(nome_caminho)
+    local caminho = getCaminho(nome_caminho)
     local movimentos = caminho.movimentos
     for i = #movimentos, 1, -1 do
         local movimento = movimentos[i]
@@ -500,14 +521,13 @@ end
 
 
 -- Limpa o registro de um caminho sem deleta-lo
-local function limparCaminho(nome)
-    Caminhos[nome].movimentos = {}
+local function limparCaminho(nome_caminho)
+    Caminhos[nome_caminho].movimentos = {}
 end
 
 -- Calcula o tamanho de um caminho
-local function tamanhoCaminho(nome)
-    local caminho = getCaminho(nome)
-    local movimentos = caminho.movimentos
+local function tamanhoCaminho(nome_caminho)
+    local movimentos = getMovimentos(nome_caminho)
 
     local dict_gastos = {
         [MOVIMENTO.UP] = 1,
@@ -523,6 +543,13 @@ local function tamanhoCaminho(nome)
         tamanho = tamanho + dict_gastos[m]
     end
     return tamanho
+end
+
+
+-- Salva os movimentos de um caminho em um nome_arquivo
+-- para que possam ser carregaos eventualmente
+local function salvarCaminho(nome_caminho, nome_arquivo)
+    local movimentos = getMovimentos(nome_caminho)
 end
 
 
@@ -718,15 +745,18 @@ return {
     smoothWalkTo = smoothWalkTo,
 
     getCaminho = getCaminho,
-    comecarCaminho = comecarCaminho,
+    getMovimentos = getMovimentos,
+    comecarCaminho = novoCaminho,
     deletarCaminho = deletarCaminho,
-    ativarCaminho = ativarCaminho,
-    desativarCaminho = desativarCaminho,
+    existeCaminho = existeCaminho,
+    iniciarGravacaoCaminho = iniciarGravacaoCaminho,
+    pararGravacaoCaminho = pararGravacaoCaminho,
     registrarMovimento = registrarMovimento,
     percorrerCaminho = percorrerCaminho,
     desfazerCaminho = desfazerCaminho,
     limparCaminho = limparCaminho,
     tamanhoCaminho = tamanhoCaminho,
+    salvarCaminho = salvarCaminho,
 
     search = search,
     searchNotEmptySlot = searchNotEmptySlot,
