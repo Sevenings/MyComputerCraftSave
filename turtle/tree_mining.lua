@@ -11,7 +11,7 @@ local function backup()
     -- Salva a posição atual
 
     -- Volta para o bau
-    tp.desativarCaminho('bau')
+    tp.pararGravacaoCaminho('bau')
     tp.desfazerCaminho('bau')
 
     -- Chegando lá, se o combustivel for pouco, reabastece
@@ -28,9 +28,9 @@ local function backup()
 
     -- Volta
     print('Voltando ao checkpoint.')
-    tp.ativarCaminho('bau')
+    tp.iniciarGravacaoCaminho('bau')
     tp.limparCaminho('bau')
-    tp.desativarCaminho('checkpoint')
+    tp.pararGravacaoCaminho('checkpoint')
     tp.desfazerCaminho('checkpoint')
 end
 
@@ -118,7 +118,7 @@ end
 
 -- Após chegar ao final, volte ao começo
 print('Terminando viagem')
-tp.desativarCaminho('bau')
+tp.pararGravacaoCaminho('bau')
 tp.desfazerCaminho('bau')
 
 -- Esvazia o inventario

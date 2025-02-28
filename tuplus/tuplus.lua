@@ -459,10 +459,16 @@ local function getMovimentos(nome_caminho)
 end
 
 
+-- Altera o valor de um caminho
+local function setCaminho(nome_caminho, caminho)
+    Caminhos[nome_caminho] = caminho
+end
+
+
 -- Cria um caminho novo na lista de caminhos
 -- Caminhos sao ativos por padrao
 local function novoCaminho(nome)
-    Caminhos[nome] = {
+    local caminho = {
         -- Lista de movimentos do caminho
         movimentos = {},
 
@@ -471,6 +477,9 @@ local function novoCaminho(nome)
         -- neste caminho
         gravando = false,
     }
+
+    Caminhos[nome] = caminho
+    return caminho
 end
 
 -- Remove um caminho da lista de caminhos
@@ -549,7 +558,28 @@ end
 -- Salva os movimentos de um caminho em um nome_arquivo
 -- para que possam ser carregaos eventualmente
 local function salvarCaminho(nome_caminho, nome_arquivo)
-    local movimentos = getMovimentos(nome_caminho)
+    local caminho = getCaminho(nome_caminho)
+    local conteudo = textutils.serializeJSON(caminho)
+    local file = io.open(nome_arquivo, "w")
+    if file then
+        file:write(conteudo)
+        file:flush()
+        file:close()
+    else
+        print("[Erro] Arquivo ".. nome_arquivo.. " não pode ser criado")
+    end
+end
+
+local function carregarCaminho(nome_caminho, nome_arquivo)
+    local file = io.open(nome_arquivo, "r")
+    if not file then
+        print("[Erro] Arquivo ".. nome_arquivo .."não existe")
+        return
+    end
+    local content = file:read()
+    file:close()
+    local caminho_carregado = textutils.unserializeJSON(content)
+    setCaminho(nome_caminho, caminho_carregado)
 end
 
 
@@ -745,6 +775,7 @@ return {
     smoothWalkTo = smoothWalkTo,
 
     getCaminho = getCaminho,
+    setCaminho = setCaminho,
     getMovimentos = getMovimentos,
     comecarCaminho = novoCaminho,
     deletarCaminho = deletarCaminho,
@@ -757,6 +788,7 @@ return {
     limparCaminho = limparCaminho,
     tamanhoCaminho = tamanhoCaminho,
     salvarCaminho = salvarCaminho,
+    carregarCaminho = carregarCaminho,
 
     search = search,
     searchNotEmptySlot = searchNotEmptySlot,
