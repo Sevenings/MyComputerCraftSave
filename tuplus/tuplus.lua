@@ -307,10 +307,10 @@ end
 local function forward()
     local moved = turtle.forward()
     if moved then
-          local position = getPosition()
-          local facing = getFacing()
+      local position = getPosition()
+      local facing = getFacing()
       setPosition(position + facingToVector(facing))
-          registrarMovimento(MOVIMENTO.FORWARD)
+      registrarMovimento(MOVIMENTO.FORWARD)
     end
     return moved
 end
