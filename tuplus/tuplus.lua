@@ -271,7 +271,7 @@ local function turnTo(targetDirection)
     while getFacing() ~= targetDirection do
         if facingDistance(getFacing(), targetDirection) > 1 then
             turnLeft()
-        else 
+        else
             turnRight()
         end
     end
@@ -306,12 +306,12 @@ end
 --Moving functions
 local function forward()
     local moved = turtle.forward()
-	if moved then
-        local position = getPosition()
-        local facing = getFacing()
-		setPosition(position + facingToVector(facing))
-        registrarMovimento(MOVIMENTO.FORWARD)
-	end
+    if moved then
+          local position = getPosition()
+          local facing = getFacing()
+      setPosition(position + facingToVector(facing))
+          registrarMovimento(MOVIMENTO.FORWARD)
+    end
     return moved
 end
 
