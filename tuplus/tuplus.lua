@@ -680,8 +680,8 @@ end
 local function place()
     canPlace, error = turtle.place()
     while not canPlace do
-        if error == "Cannot place block here" then 
-            return turtle.place() 
+        if error == "Cannot place block here" then
+            return turtle.place()
         end
         if not searchNotEmptySlot() then
             return turtle.place()
@@ -695,8 +695,8 @@ end
 local function placeDown()
     canPlace, error = turtle.placeDown()
     while not canPlace do
-        if error == "Cannot place block here" then 
-            return turtle.placeDown() 
+        if error == "Cannot place block here" then
+            return turtle.placeDown()
         end
         if not searchNotEmptySlot() then
             return turtle.placeDown()
