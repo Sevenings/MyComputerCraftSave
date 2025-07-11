@@ -319,11 +319,11 @@ end
 local function back()
     local moved = turtle.back()
     if moved then
-        local position = getPosition()
-        local facing = getFacing()
-		setPosition(position - facingToVector(facing))
-        registrarMovimento(MOVIMENTO.BACK)
-	end
+      local position = getPosition()
+      local facing = getFacing()
+      setPosition(position - facingToVector(facing))
+      registrarMovimento(MOVIMENTO.BACK)
+    end
     return moved
 end
 
