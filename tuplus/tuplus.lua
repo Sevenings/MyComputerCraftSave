@@ -329,24 +329,24 @@ end
 
 
 local function up()
-    local moved = turtle.up()
-	if moved then
-        local position = getPosition()
+  local moved = turtle.up()
+  if moved then
+    local position = getPosition()
 		setPosition(position + vector.new(0, 1, 0))
-        registrarMovimento(MOVIMENTO.UP)
+    registrarMovimento(MOVIMENTO.UP)
 	end
-    return moved
+  return moved
 end
 
 
 local function down()
-    local moved = turtle.down()
+  local moved = turtle.down()
 	if moved then
-        local position = getPosition()
-		setPosition(position + vector.new(0, -1, 0))
-        registrarMovimento(MOVIMENTO.DOWN)
+    local position = getPosition()
+    setPosition(position + vector.new(0, -1, 0))
+    registrarMovimento(MOVIMENTO.DOWN)
 	end
-    return moved
+  return moved
 end
 
 
@@ -365,7 +365,7 @@ local function walkTo(destination)
         tryDig()
         forward()
     end
-    
+
     if getPosition().z < z then
         turnTo(SOUTH)
     elseif getPosition().z > z then
