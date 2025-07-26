@@ -4,18 +4,14 @@ local function backup()
     print('Fazendo backup.')
 
     -- Tenha certeza que o checkpoint ainda não existe
-    if tp.getCaminho('checkpoint') then
-        tp.deletarCaminho('checkpoint')
-    end
-    tp.comecarCaminho('checkpoint')
     -- Salva a posição atual
+    tp.limparCaminho('checkpoint')
 
     -- Volta para o bau
-    tp.pararGravacaoCaminho('bau')
     tp.desfazerCaminho('bau')
 
     -- Chegando lá, se o combustivel for pouco, reabastece
-    if turtle.getFuelLevel() <= 16 then
+    if turtle.getFuelLevel() <= tamanhoCaminho('checkpoint') then
         print('Reabastecendo.')
         tp.refuelAll()
     end
@@ -28,17 +24,16 @@ local function backup()
 
     -- Volta
     print('Voltando ao checkpoint.')
-    tp.iniciarGravacaoCaminho('bau')
     tp.limparCaminho('bau')
-    tp.pararGravacaoCaminho('checkpoint')
+    tp.iniciarGravacaoCaminho('bau')
     tp.desfazerCaminho('checkpoint')
 end
 
 -- setup colocar o bau
 tp.turnLeft()
-if not tp.isBlock('quark:oak_chest') then
+if not tp.isBlock('minecraft:chest') then
     print('Nao ha bau. Colocando...')
-    tp.search('quark:oak_chest')
+    tp.search('minecraft:chest')
     tp.tryDig()
     tp.place()
 
@@ -62,6 +57,7 @@ if not tp.isBlock('quark:oak_chest') then
     tp.turnRight()
 else
     print('Bau detectado.')
+    tp.turnRight()
 end
 
 -- Reabastecer
@@ -71,7 +67,7 @@ tp.refuelAll()
 
 
 -- Salvar um caminho de volta para o bau
-tp.comecarCaminho('bau')
+tp.gravarCaminho('bau')
 
 
 -- Argumentos
@@ -118,7 +114,6 @@ end
 
 -- Após chegar ao final, volte ao começo
 print('Terminando viagem')
-tp.pararGravacaoCaminho('bau')
 tp.desfazerCaminho('bau')
 
 -- Esvazia o inventario
