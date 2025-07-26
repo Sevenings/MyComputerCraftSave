@@ -24,7 +24,7 @@ local MOVIMENTO = {
 
 
 -- Adiciona um movimento a todos os caminhos ate entao registrados
-function tuplus.registrarMovimento(movimento)
+tuplus.registrarMovimento = function(movimento)
     for _, caminho in pairs(Caminhos) do
         if caminho.gravando then
             table.insert(caminho.movimentos, movimento)
@@ -42,7 +42,7 @@ WEST = 2
 NORTH = 3
 
 
-function tuplus.facingToString(direction)
+tuplus.facingToString = function(direction)
     if direction == EAST then return "East"
     elseif direction == SOUTH then return "South"
     elseif direction == WEST then return "West"
@@ -53,7 +53,7 @@ end
 
 -- Status getters e setters
 local fileName = "status.config"
-function tuplus.getStatus()
+tuplus.getStatus = function()
     if not fs.exists(fileName) then
         fs.open(fileName, "w")
     end
@@ -67,7 +67,7 @@ function tuplus.getStatus()
 end
 
 
-function tuplus.setStatus(newStatusTable)
+tuplus.setStatus = function(newStatusTable)
     local file = io.open(fileName, "w")
     local content = textutils.serialize(newStatusTable)
     file:write(content)
@@ -77,23 +77,23 @@ end
 
 -- Facing getter e setter
 FACING = nil
-function tuplus.getFacing()
+tuplus.getFacing = function()
     if FACING then
         return FACING
     end
-    local status = getStatus()
+    local status = tuplus.getStatus()
     FACING = status.facing
     return FACING
 end
 
 
-function tuplus.setFacing(direction)
+tuplus.setFacing = function(direction)
     FACING = direction
 end
 
 
-function tuplus.saveFacing()
-    local status = getStatus()
+tuplus.saveFacing = function()
+    local status = tuplus.getStatus()
     assert(status.facing)
     status.facing = FACING
     setStatus(status)
@@ -102,24 +102,24 @@ end
 
 -- Position getter e setter
 POSITION = nil
-function tuplus.getPosition()
+tuplus.getPosition = function()
     if POSITION then
         return POSITION
     end
-    local status = getStatus()
+    local status = tuplus.getStatus()
     local posTable = status.position
     POSITION = vector.new(posTable.x, posTable.y, posTable.z)
     return POSITION
 end
 
 
-function tuplus.setPosition(pos)
+tuplus.setPosition = function(pos)
     POSITION = pos
 end
 
 
-function tuplus.savePosition()
-    local status = getStatus()
+tuplus.savePosition = function()
+    local status = tuplus.getStatus()
     assert(status.position)
     status.position = POSITION
     setStatus(status)
@@ -127,7 +127,7 @@ end
 
 
 -- Conversor Facing(String) to Facing(Number)
-function tuplus.facingToNum(facing)
+tuplus.facingToNum = function(facing)
     local facing = string.lower(facing)
     if facing == "w" then return WEST
     elseif facing == "s" then return SOUTH
@@ -138,7 +138,7 @@ function tuplus.facingToNum(facing)
 end
 
 
-function tuplus.facingToVector(facing)
+tuplus.facingToVector = function(facing)
 	if facing == EAST then
 		return vector.new(1, 0, 0)
 	elseif facing == WEST then
@@ -151,7 +151,7 @@ function tuplus.facingToVector(facing)
 end
 
 
-function tuplus.vectorToFacing(vetor)
+tuplus.vectorToFacing = function(vetor)
     if vetor:equals(vector.new(1, 0, 0)) then return EAST
     elseif vetor:equals(vector.new(-1, 0, 0)) then return WEST
     elseif vetor:equals(vector.new(0, 0, 1)) then return SOUTH
@@ -162,45 +162,45 @@ end
 
 --Orientation
 --Facing orientation
-function tuplus.askForDirection()
+tuplus.askForDirection = function()
     local facing = ioutils.askFor(facingToNum, "Set the direction: [n, s, e, w]", "Not a valid direction...")
     return facing
 end
 
 
-function tuplus.gpsFindDirection()
-    local pos_a = gpsFindPosition()
+tuplus.gpsFindDirection = function()
+    local pos_a = tuplus.gpsFindPosition()
     local tries = 0
     while turtle.detect() do
-        turnLeft() 
+        tuplus.turnLeft()
         tries = tries + 1
         if tries > 3 then
             tryDig()
             break
         end
     end
-    forward()
-    local pos_b = gpsFindPosition()
-    back()
+    tuplus.forward()
+    local pos_b = tuplus.gpsFindPosition()
+    tuplus.back()
     local look_vector = pos_b - pos_a
-    return vectorToFacing(look_vector)
+    return tuplus.vectorToFacing(look_vector)
 end
 
 
-function tuplus.orientateFacing(option)
+tuplus.orientateFacing = function(option)
     local modem = peripheral.find("modem")
     local facing_direction = 0
     if modem and gps.locate() and not (option == "manual") then
-        facing_direction = gpsFindDirection()
+        facing_direction = tuplus.gpsFindDirection()
     else
-        facing_direction = askForDirection()
+        facing_direction = tuplus.askForDirection()
     end
-    setFacing(facing_direction)
+    tuplus.setFacing(facing_direction)
 end
 
 
 --Position orientation
-function tuplus.askForPosition()
+tuplus.askForPosition = function()
     local x = ioutils.askFor(tonumber, "Set X:", "Not a number...")
     local y = ioutils.askFor(tonumber, "Set Y:", "Not a number...")
     local z = ioutils.askFor(tonumber, "Set Z:", "Not a number...")
@@ -209,25 +209,25 @@ function tuplus.askForPosition()
 end
 
 
-function tuplus.gpsFindPosition()
+tuplus.gpsFindPosition = function()
     local x, y, z = gps.locate()
     return vector.new(x, y, z)
 end
 
 
-function tuplus.orientatePosition(option)
+tuplus.orientatePosition = function(option)
     local modem = peripheral.find("modem")
     local position = vector.new(0, 0, 0)
     if modem and gps.locate() and not (option == "manual") then
-        position = gpsFindPosition()
+        position = tuplus.gpsFindPosition()
     else
-        position = askForPosition()
+        position = tuplus.askForPosition()
     end
-    setPosition(position)
+    tuplus.setPosition(position)
 end
 
 
-function tuplus.canGpsOrientate()
+tuplus.canGpsOrientate = function()
     local modem = peripheral.find("modem")
     if modem and gps.locate() then
         return true
@@ -237,51 +237,51 @@ end
 
 
 --To orientate
-function tuplus.orientate(option)
-    orientateFacing(option)
-    orientatePosition(option)
+tuplus.orientate = function(option)
+    tuplus.orientateFacing(option)
+    tuplus.orientatePosition(option)
 end
 
 
-function tuplus.facingDistance(dirInicial, dirFinal)    --Matemática circular :)
+tuplus.facingDistance = function(dirInicial, dirFinal)    --Matemática circular :)
     return (dirFinal - dirInicial) % 4
 end
 
 
 -- Funções para rotacionar
-function tuplus.turnRight()
+tuplus.turnRight = function()
     turtle.turnRight()
-    local facing = getFacing()
+    local facing = tuplus.getFacing()
     facing = facing + 1
     facing = facing%4     --Matemática circular :3
-    setFacing(facing)
-    registrarMovimento(MOVIMENTO.RIGHT)
+    tuplus.setFacing(facing)
+    tuplus.registrarMovimento(MOVIMENTO.RIGHT)
 end
 
 
-function tuplus.turnLeft()
+tuplus.turnLeft = function()
     turtle.turnLeft()
-    local facing = getFacing()
+    local facing = tuplus.getFacing()
     facing = facing - 1
     facing = facing%4     --Matemática de relógio XD
-    setFacing(facing)
-    registrarMovimento(MOVIMENTO.LEFT)
+    tuplus.setFacing(facing)
+    tuplus.registrarMovimento(MOVIMENTO.LEFT)
 end
 
 
-function tuplus.turnTo(targetDirection)
-    while getFacing() ~= targetDirection do
-        if facingDistance(getFacing(), targetDirection) > 1 then
-            turnLeft()
+tuplus.turnTo = function(targetDirection)
+    while tuplus.getFacing() ~= targetDirection do
+        if tuplus.facingDistance(tuplus.getFacing(), targetDirection) > 1 then
+            tuplus.turnLeft()
         else
-            turnRight()
+            tuplus.turnRight()
         end
     end
 end
 
 
 --Digging Functions
-function tuplus.tryDig()
+tuplus.tryDig = function()
     while turtle.detect() do
         turtle.dig()
         sleep(0.1)
@@ -289,7 +289,7 @@ function tuplus.tryDig()
 end
 
 
-function tuplus.tryDigUp()
+tuplus.tryDigUp = function()
     while turtle.detectUp() do
         turtle.digUp()
         sleep(0.1)
@@ -297,7 +297,7 @@ function tuplus.tryDigUp()
 end
 
 
-function tuplus.tryDigDown()
+tuplus.tryDigDown = function()
     while turtle.detectDown() do
         turtle.digDown()
         sleep(0.1)
@@ -306,118 +306,118 @@ end
 
 
 --Moving functions
-function tuplus.forward()
+tuplus.forward = function()
     local moved = turtle.forward()
     if moved then
-      local position = getPosition()
-      local facing = getFacing()
-      setPosition(position + facingToVector(facing))
-      registrarMovimento(MOVIMENTO.FORWARD)
+      local position = tuplus.getPosition()
+      local facing = tuplus.getFacing()
+      tuplus.setPosition(position + tuplus.facingToVector(facing))
+      tuplus.registrarMovimento(MOVIMENTO.FORWARD)
     end
     return moved
 end
 
 
-function tuplus.back()
+tuplus.back = function()
     local moved = turtle.back()
     if moved then
-      local position = getPosition()
-      local facing = getFacing()
-      setPosition(position - facingToVector(facing))
-      registrarMovimento(MOVIMENTO.BACK)
+      local position = tuplus.getPosition()
+      local facing = tuplus.getFacing()
+      tuplus.setPosition(position - tuplus.facingToVector(facing))
+      tuplus.registrarMovimento(MOVIMENTO.BACK)
     end
     return moved
 end
 
 
-function tuplus.up()
+tuplus.up = function()
   local moved = turtle.up()
   if moved then
-    local position = getPosition()
-		setPosition(position + vector.new(0, 1, 0))
-    registrarMovimento(MOVIMENTO.UP)
+    local position = tuplus.getPosition()
+		tuplus.setPosition(position + vector.new(0, 1, 0))
+    tuplus.registrarMovimento(MOVIMENTO.UP)
 	end
   return moved
 end
 
 
-function tuplus.down()
+tuplus.down = function()
   local moved = turtle.down()
 	if moved then
-    local position = getPosition()
-    setPosition(position + vector.new(0, -1, 0))
-    registrarMovimento(MOVIMENTO.DOWN)
+    local position = tuplus.getPosition()
+    tuplus.setPosition(position + vector.new(0, -1, 0))
+    tuplus.registrarMovimento(MOVIMENTO.DOWN)
 	end
   return moved
 end
 
 
-function tuplus.walkTo(destination)
+tuplus.walkTo = function(destination)
     local x = destination.x
     local y = destination.y
     local z = destination.z
 
-    if getPosition().x > x then
-        turnTo(WEST)
-    elseif getPosition().x < x then
-        turnTo(EAST)
+    if tuplus.getPosition().x > x then
+        tuplus.turnTo(WEST)
+    elseif tuplus.getPosition().x < x then
+        tuplus.turnTo(EAST)
     end
 
-    while getPosition().x ~= x do
-        tryDig()
-        forward()
+    while tuplus.getPosition().x ~= x do
+        tuplus.tryDig()
+        tuplus.forward()
     end
 
-    if getPosition().z < z then
-        turnTo(SOUTH)
-    elseif getPosition().z > z then
-        turnTo(NORTH)
+    if tuplus.getPosition().z < z then
+        tuplus.turnTo(SOUTH)
+    elseif tuplus.getPosition().z > z then
+        tuplus.turnTo(NORTH)
     end
 
-    while getPosition().z ~= z do
-        tryDig()
-        forward()
+    while tuplus.getPosition().z ~= z do
+        tuplus.tryDig()
+        tuplus.forward()
     end
 
-    while getPosition().y ~= y do
-        if getPosition().y < y then
-            tryDigUp()
-            up()
-        elseif getPosition().y > y then
-            tryDigDown()
-            down()
+    while tuplus.getPosition().y ~= y do
+        if tuplus.getPosition().y < y then
+            tuplus.tryDigUp()
+            tuplus.up()
+        elseif tuplus.getPosition().y > y then
+            tuplus.tryDigDown()
+            tuplus.down()
         end
     end
 end
 
 
-function tuplus.upUntil()
-    while up() do end
+tuplus.upUntil = function()
+    while tuplus.up() do end
 end
 
 
-function tuplus.downUntil()
-    while down() do end
+tuplus.downUntil = function()
+    while tuplus.down() do end
 end
 
 
-function tuplus.forwardUntil()
-    while forward() do end
+tuplus.forwardUntil = function()
+    while tuplus.forward() do end
 end
 
 
-function tuplus.backUntil()
-    while back() do end
+tuplus.backUntil = function()
+    while tuplus.back() do end
 end
 
 
-function tuplus.smoothWalkTo(destination)
-    while not getPosition().equals(destination) do
-        local deslocamento = destination - getPosition()
-        while deslocamento:dot(facingToVector(getFacing())) <= 0 do
-            turnLeft()
+tuplus.smoothWalkTo = function(destination)
+    while not tuplus.getPosition().equals(destination) do
+        local deslocamento = destination - tuplus.getPosition()
+        while deslocamento:dot(tuplus.facingToVector(tuplus.getFacing())) <= 0 do
+            tuplus.turnLeft()
         end
-        forward()
+        tuplus.forward()
     end
 end
 
@@ -449,27 +449,27 @@ local DICT_MOVIMENTO_R = {
 
 
 -- Retorna o caminho com certo nome
-function tuplus.getCaminho(nome_caminho)
+tuplus.getCaminho = function(nome_caminho)
     return Caminhos[nome_caminho]
 end
 
 
 -- Retorna a lista de movimentos de um caminho
-function tuplus.getMovimentos(nome_caminho)
-    local caminho = getCaminho(nome_caminho)
+tuplus.getMovimentos = function(nome_caminho)
+    local caminho = tuplus.getCaminho(nome_caminho)
     return caminho.movimentos
 end
 
 
 -- Altera o valor de um caminho
-function tuplus.setCaminho(nome_caminho, caminho)
+tuplus.setCaminho = function(nome_caminho, caminho)
     Caminhos[nome_caminho] = caminho
 end
 
 
 -- Cria um caminho novo na lista de caminhos
 -- Caminhos sao ativos por padrao
-function tuplus.novoCaminho(nome)
+tuplus.novoCaminho = function(nome)
     local caminho = {
         -- Lista de movimentos do caminho
         movimentos = {},
@@ -485,29 +485,29 @@ function tuplus.novoCaminho(nome)
 end
 
 -- Remove um caminho da lista de caminhos
-function tuplus.deletarCaminho(nome_caminho)
+tuplus.deletarCaminho = function(nome_caminho)
     Caminhos[nome_caminho] = nil
 end
 
 
 -- Verifica se um caminho existe
-function tuplus.existeCaminho(nome_caminho)
+tuplus.existeCaminho = function(nome_caminho)
     return Caminhos[nome_caminho] ~= nil
 end
 
 
 -- Inicia a gravação de um caminho para poder ser atualizado
-function tuplus.gravarCaminho(nome_caminho)
-    if not existeCaminho(nome_caminho) then
-        novoCaminho(nome_caminho)
+tuplus.gravarCaminho = function(nome_caminho)
+    if not tuplus.existeCaminho(nome_caminho) then
+        tuplus.novoCaminho(nome_caminho)
     end
     Caminhos[nome_caminho].gravando = true
 end
 
 
 -- Encerra a gravação de um caminho, para que nao possa ser alterado
-function tuplus.pararGravacaoCaminho(nome_caminho)
-    if not existeCaminho(nome_caminho) then
+tuplus.pararGravacaoCaminho = function(nome_caminho)
+    if not tuplus.existeCaminho(nome_caminho) then
         return
     end
     Caminhos[nome_caminho].gravando = false
@@ -515,8 +515,8 @@ end
 
 
 -- Percorre um caminho
-function tuplus.percorrerCaminho(nome_caminho)
-    local caminho = getCaminho(nome_caminho)
+tuplus.percorrerCaminho = function(nome_caminho)
+    local caminho = tuplus.getCaminho(nome_caminho)
     for k, movimento in pairs(caminho.movimentos) do
         DICT_MOVIMENTO[movimento]()
     end
@@ -524,9 +524,9 @@ end
 
 
 -- Percorre um caminho de tras para frente
-function tuplus.desfazerCaminho(nome_caminho)
-    pararGravacaoCaminho(nome_caminho)
-    local caminho = getCaminho(nome_caminho)
+tuplus.desfazerCaminho = function(nome_caminho)
+    tuplus.pararGravacaoCaminho(nome_caminho)
+    local caminho = tuplus.getCaminho(nome_caminho)
     local movimentos = caminho.movimentos
     for i = #movimentos, 1, -1 do
         local movimento = movimentos[i]
@@ -536,13 +536,13 @@ end
 
 
 -- Limpa o registro de um caminho sem deleta-lo
-function tuplus.limparCaminho(nome_caminho)
+tuplus.limparCaminho = function(nome_caminho)
     Caminhos[nome_caminho].movimentos = {}
 end
 
 -- Calcula o tamanho de um caminho
-function tuplus.tamanhoCaminho(nome_caminho)
-    local movimentos = getMovimentos(nome_caminho)
+tuplus.tamanhoCaminho = function(nome_caminho)
+    local movimentos = tuplus.getMovimentos(nome_caminho)
 
     local dict_gastos = {
         [MOVIMENTO.UP] = 1,
@@ -563,8 +563,8 @@ end
 
 -- Salva os movimentos de um caminho em um nome_arquivo
 -- para que possam ser carregaos eventualmente
-function tuplus.salvarCaminho(nome_caminho, nome_arquivo)
-    local caminho = getCaminho(nome_caminho)
+tuplus.salvarCaminho = function(nome_caminho, nome_arquivo)
+    local caminho = tuplus.getCaminho(nome_caminho)
     local conteudo = textutils.serializeJSON(caminho)
     local file = io.open(nome_arquivo, "w")
     if file then
@@ -576,7 +576,7 @@ function tuplus.salvarCaminho(nome_caminho, nome_arquivo)
     end
 end
 
-function tuplus.carregarCaminho(nome_caminho, nome_arquivo)
+tuplus.carregarCaminho = function(nome_caminho, nome_arquivo)
     local file = io.open(nome_arquivo, "r")
     if not file then
         print("[Erro] Arquivo ".. nome_arquivo .."não existe")
@@ -585,12 +585,12 @@ function tuplus.carregarCaminho(nome_caminho, nome_arquivo)
     local content = file:read()
     file:close()
     local caminho_carregado = textutils.unserializeJSON(content)
-    setCaminho(nome_caminho, caminho_carregado)
+    tuplus.setCaminho(nome_caminho, caminho_carregado)
 end
 
 
 -- Funcoes de Inventario
-function tuplus.search(itemName)
+tuplus.search = function(itemName)
     for slot=1, 16 do
         local item = turtle.getItemDetail(slot)
         if item then
@@ -604,7 +604,7 @@ function tuplus.search(itemName)
 end
 
 
-function tuplus.searchNotEmptySlot()
+tuplus.searchNotEmptySlot = function()
     for slot=1, 16 do
         if turtle.getItemCount(slot) > 0 then 
             turtle.select(slot)
@@ -616,7 +616,7 @@ end
 
 
 -- Verifica se inventario esta cheio 
-function tuplus.inventarioCheio()
+tuplus.inventarioCheio = function()
     local selected_slot = turtle.getSelectedSlot()
     for s=16, 1, -1 do
         turtle.select(s)
@@ -631,7 +631,7 @@ end
 
 
 -- Esvazia o inventario dropando todos os itens
-function tuplus.esvaziarInventario()
+tuplus.esvaziarInventario = function()
     local selected_slot = turtle.getSelectedSlot()
     for s=1, 16 do
         turtle.select(s)
@@ -642,38 +642,38 @@ end
 
 
 -- Inspeciona para ver se o bloco da frente eh o desejado
-function tuplus.isBlock(block_name)
+tuplus.isBlock = function(block_name)
     local _, block = turtle.inspect()
     return block.name == block_name
 end
 
 
 -- Inspeciona para ver se o bloco de cima eh o desejado
-function tuplus.isBlockUp(block_name)
+tuplus.isBlockUp = function(block_name)
     local _, block = turtle.inspectUp()
     return block.name == block_name
 end
 
 
 -- Inspeciona para ver se o bloco de baixo eh o desejado
-function tuplus.isBlockDown(block_name)
+tuplus.isBlockDown = function(block_name)
     local _, block = turtle.inspectDown()
     return block.name == block_name
 end
 
 
-function tuplus.distanceToMe(final_pos)
-    local diff_vector = final_pos - (getPosition() + vector.new(0.5, 0.5, 0.5))
+tuplus.distanceToMe = function(final_pos)
+    local diff_vector = final_pos - (tuplus.getPosition() + vector.new(0.5, 0.5, 0.5))
     return diff_vector:length()
 end
 
 
-function tuplus.closestPos(pos_list)
-    local menor_distancia = distanceToMe(pos_list[1])
+tuplus.closestPos = function(pos_list)
+    local menor_distancia = tuplus.distanceToMe(pos_list[1])
     local closest = pos_list[1]
     for i,posicao in ipairs(pos_list) do
-        if distanceToMe(posicao) < menor_distancia then
-            menor_distancia = distanceToMe(posicao)
+        if tuplus.distanceToMe(posicao) < menor_distancia then
+            menor_distancia = tuplus.distanceToMe(posicao)
             closest = posicao
         end
     end
@@ -683,13 +683,13 @@ end
 
 
 -- Funcoes de construcao
-function tuplus.place()
+tuplus.place = function()
     canPlace, error = turtle.place()
     while not canPlace do
         if error == "Cannot place block here" then
             return turtle.place()
         end
-        if not searchNotEmptySlot() then
+        if not tuplus.searchNotEmptySlot() then
             return turtle.place()
         end
         canPlace, error = turtle.place()
@@ -698,13 +698,13 @@ function tuplus.place()
 end
 
 
-function tuplus.placeDown()
+tuplus.placeDown = function()
     canPlace, error = turtle.placeDown()
     while not canPlace do
         if error == "Cannot place block here" then
             return turtle.placeDown()
         end
-        if not searchNotEmptySlot() then
+        if not tuplus.searchNotEmptySlot() then
             return turtle.placeDown()
         end
         canPlace, error = turtle.placeDown()
@@ -713,13 +713,13 @@ function tuplus.placeDown()
 end
 
 
-function tuplus.placeUp()
+tuplus.placeUp = function()
     canPlace, error = turtle.placeUp()
     while not canPlace do
-        if error == "Cannot place block here" then 
+        if error == "Cannot place block here" then
             return turtle.placeUp()
         end
-        if not searchNotEmptySlot() then
+        if not tuplus.searchNotEmptySlot() then
             return turtle.placeUp()
         end
         canPlace, error = turtle.placeUp()
@@ -729,7 +729,7 @@ end
 
 
 -- Funções de combustivel
-function tuplus.refuelAll()
+tuplus.refuelAll = function()
     shell.run('refuel', 'all')
 end
 
