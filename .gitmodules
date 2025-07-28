@@ -1,0 +1,4 @@
+[submodule "artist"]
+	path = artist
+	url = https://github.com/SquidDev-CC/artist.git
+
