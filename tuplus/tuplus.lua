@@ -36,7 +36,10 @@ end
 
 
 
---Directional Functions
+-----------------------
+-- Directional Functions
+-----------------------
+
 EAST = 0
 SOUTH = 1
 WEST = 2
@@ -52,7 +55,10 @@ tuplus.facingToString = function(direction)
 end
 
 
+---------------------------
 -- Status getters e setters
+---------------------------
+
 local fileName = "status.config"
 tuplus.getStatus = function()
     if not fs.exists(fileName) then
@@ -76,7 +82,10 @@ tuplus.setStatus = function(newStatusTable)
 end
 
 
+-------------------------
 -- Facing getter e setter
+-------------------------
+
 FACING = nil
 tuplus.getFacing = function()
     if FACING then
@@ -101,7 +110,10 @@ tuplus.saveFacing = function()
 end
 
 
+---------------------------
 -- Position getter e setter
+---------------------------
+
 POSITION = nil
 tuplus.getPosition = function()
     if POSITION then
@@ -126,8 +138,10 @@ tuplus.savePosition = function()
     tuplus.setStatus(status)
 end
 
+---------------------------------------------
+-- Conversão Facing(String) to Facing(Number)
+---------------------------------------------
 
--- Conversor Facing(String) to Facing(Number)
 tuplus.facingToNum = function(facing)
     local facing = string.lower(facing)
     if facing == "w" then return WEST
@@ -161,7 +175,10 @@ tuplus.vectorToFacing = function(vetor)
 end
 
 
---Orientation
+--------------
+-- Orientation
+--------------
+
 --Facing orientation
 tuplus.askForDirection = function()
     local facing = ioutils.askFor(tuplus.facingToNum, "Set the direction: [n, s, e, w]", "Not a valid direction...")
@@ -201,7 +218,10 @@ tuplus.orientateFacing = function(option)
 end
 
 
---Position orientation
+-----------------------
+-- Position orientation
+-----------------------
+
 tuplus.askForPosition = function()
     local x = ioutils.askFor(tonumber, "Set X:", "Not a number...")
     local y = ioutils.askFor(tonumber, "Set Y:", "Not a number...")
@@ -246,12 +266,10 @@ tuplus.orientate = function(option)
 end
 
 
-tuplus.facingDistance = function(dirInicial, dirFinal)    --Matemática circular :)
-    return (dirFinal - dirInicial) % 4
-end
-
-
+--------------------------
 -- Funções para rotacionar
+--------------------------
+
 tuplus.turnRight = function()
     turtle.turnRight()
     local facing = tuplus.getFacing()
@@ -283,7 +301,15 @@ tuplus.turnTo = function(targetDirection)
 end
 
 
+tuplus.facingDistance = function(dirInicial, dirFinal)    --Matemática circular :)
+    return (dirFinal - dirInicial) % 4
+end
+
+
+-------------------
 --Digging Functions
+-------------------
+
 tuplus.tryDig = function()
     while turtle.detect() do
         turtle.dig()
@@ -308,53 +334,86 @@ tuplus.tryDigDown = function()
 end
 
 
+------------------
 --Moving functions
-tuplus.forward = function()
+------------------
+
+--- Anda para frente n vezes. O movimento é registrado internamente.
+--- @param n number|nil Número de passos (padrão: 1)
+--- @return boolean Retorna true se a turtle conseguiu andar. Caso contrário, retorna false e o número de passos que ela conseguiu andar.
+tuplus.forward = function(n)
+  n = n or 1
+  for i = 1, n do
     local moved = turtle.forward()
-    if moved then
+    if not moved then
+      return false, i-1
+    end
       local position = tuplus.getPosition()
       local facing = tuplus.getFacing()
       tuplus.setPosition(position + tuplus.facingToVector(facing))
       tuplus.registrarMovimento(MOVIMENTO.FORWARD)
-    end
-    return moved
+  end
+  return true
 end
 
 
-tuplus.back = function()
+--- Anda para trás n vezes. O movimento é registrado internamente.
+--- @param n number|nil Número de passos (padrão: 1)
+--- @return boolean Retorna true se a turtle conseguiu andar. Caso contrário, retorna false e o número de passos que ela conseguiu andar.
+tuplus.back = function(n)
+  n = n or 1
+  for i = 1, n do
     local moved = turtle.back()
-    if moved then
-      local position = tuplus.getPosition()
-      local facing = tuplus.getFacing()
-      tuplus.setPosition(position - tuplus.facingToVector(facing))
-      tuplus.registrarMovimento(MOVIMENTO.BACK)
+    if not moved then
+      return false, i-1
     end
-    return moved
-end
-
-
-tuplus.up = function()
-  local moved = turtle.up()
-  if moved then
     local position = tuplus.getPosition()
-		tuplus.setPosition(position + vector.new(0, 1, 0))
-    tuplus.registrarMovimento(MOVIMENTO.UP)
-	end
-  return moved
+    local facing = tuplus.getFacing()
+    tuplus.setPosition(position - tuplus.facingToVector(facing))
+    tuplus.registrarMovimento(MOVIMENTO.BACK)
+  end
+  return true
 end
 
 
-tuplus.down = function()
-  local moved = turtle.down()
-	if moved then
+--- Anda para cima n vezes. O movimento é registrado internamente.
+--- @param n number|nil Número de passos (padrão: 1)
+--- @return boolean Retorna true se a turtle conseguiu andar. Caso contrário, retorna false e o número de passos que ela conseguiu andar.
+tuplus.up = function(n)
+  n = n or 1
+  for i = 1, n do
+    local moved = turtle.up()
+    if not moved then
+      return false, i-1
+    end
+    local position = tuplus.getPosition()
+    tuplus.setPosition(position + vector.new(0, 1, 0))
+    tuplus.registrarMovimento(MOVIMENTO.UP)
+  end
+  return true
+end
+
+
+--- Anda para baixo n vezes. O movimento é registrado internamente.
+--- @param n number|nil Número de passos (padrão: 1)
+--- @return boolean Retorna true se a turtle conseguiu andar. Caso contrário, retorna false e o número de passos que ela conseguiu andar.
+tuplus.down = function(n)
+  n = n or 1
+  for i = 1, n do
+    local moved = turtle.down()
+    if not moved then
+      return false, i-1
+    end
     local position = tuplus.getPosition()
     tuplus.setPosition(position + vector.new(0, -1, 0))
     tuplus.registrarMovimento(MOVIMENTO.DOWN)
-	end
-  return moved
+  end
+  return true
 end
 
 
+---Anda até uma coordenada 
+---@param destination table|vector Coordenadas de destino, deve conter x, y, e z
 tuplus.walkTo = function(destination)
     local x = destination.x
     local y = destination.y
@@ -394,26 +453,31 @@ tuplus.walkTo = function(destination)
 end
 
 
+---Sobe até esbarrar em um obstáculo
 tuplus.upUntil = function()
     while tuplus.up() do end
 end
 
 
+---Desce até esbarrar em um obstáculo
 tuplus.downUntil = function()
     while tuplus.down() do end
 end
 
 
+---Vai para frente até esbarrar em um obstáculo
 tuplus.forwardUntil = function()
     while tuplus.forward() do end
 end
 
 
+---Vai para trás até esbarrar em um obstáculo
 tuplus.backUntil = function()
     while tuplus.back() do end
 end
 
 
+---Experimental. Anda até uma coordenada sem quebrar blocos. Não funciona completamente.
 tuplus.smoothWalkTo = function(destination)
     while not tuplus.getPosition().equals(destination) do
         local deslocamento = destination - tuplus.getPosition()
@@ -425,53 +489,64 @@ tuplus.smoothWalkTo = function(destination)
 end
 
 
+----------------------
 -- Funcoes de caminhos
+----------------------
+
 Caminhos = {}
 
 
 -- Dicionario movimento para funcao
 local DICT_MOVIMENTO = {
-    [MOVIMENTO.UP] = up,
-    [MOVIMENTO.DOWN] = down,
-    [MOVIMENTO.FORWARD] = forward,
-    [MOVIMENTO.BACK] = back,
-    [MOVIMENTO.LEFT] = turnLeft,
-    [MOVIMENTO.RIGHT] = turnRight,
+    [MOVIMENTO.UP] = tuplus.up,
+    [MOVIMENTO.DOWN] = tuplus.down,
+    [MOVIMENTO.FORWARD] = tuplus.forward,
+    [MOVIMENTO.BACK] = tuplus.back,
+    [MOVIMENTO.LEFT] = tuplus.turnLeft,
+    [MOVIMENTO.RIGHT] = tuplus.turnRight,
 }
 
 
 -- Dicionario movimento para funcao reverso
 local DICT_MOVIMENTO_R = {
-    [MOVIMENTO.UP] = down,
-    [MOVIMENTO.DOWN] = up,
-    [MOVIMENTO.FORWARD] = back,
-    [MOVIMENTO.BACK] = forward,
-    [MOVIMENTO.LEFT] = turnRight,
-    [MOVIMENTO.RIGHT] = turnLeft,
+    [MOVIMENTO.UP] = tuplus.down,
+    [MOVIMENTO.DOWN] = tuplus.up,
+    [MOVIMENTO.FORWARD] = tuplus.back,
+    [MOVIMENTO.BACK] = tuplus.forward,
+    [MOVIMENTO.LEFT] = tuplus.turnRight,
+    [MOVIMENTO.RIGHT] = tuplus.turnLeft,
 }
 
 
--- Retorna o caminho com certo nome
+---Retorna o caminho com o nome especificado
+---@param nome_caminho string
+---@return Caminho|nil
 tuplus.getCaminho = function(nome_caminho)
     return Caminhos[nome_caminho]
 end
 
 
--- Retorna a lista de movimentos de um caminho
+---Retorna a lista de movimentos de um caminho
+---@param nome_caminho string
+---@return Table|nil
 tuplus.getMovimentos = function(nome_caminho)
     local caminho = tuplus.getCaminho(nome_caminho)
     return caminho.movimentos
 end
 
 
--- Altera o valor de um caminho
+---Altera o valor de um caminho
+---@param nome_caminho string
+---@param caminho Caminho
 tuplus.setCaminho = function(nome_caminho, caminho)
     Caminhos[nome_caminho] = caminho
 end
 
 
--- Cria um caminho novo na lista de caminhos
--- Caminhos sao ativos por padrao
+---Cria um caminho novo na lista de caminhos
+---Caminhos *não* são gravados por padrao
+---@param nome string Nome do novo caminho
+---@return Caminho Caminho criado
 tuplus.novoCaminho = function(nome)
     local caminho = {
         -- Lista de movimentos do caminho
@@ -487,19 +562,23 @@ tuplus.novoCaminho = function(nome)
     return caminho
 end
 
--- Remove um caminho da lista de caminhos
+---Remove um caminho da lista de caminhos
+---@param nome_caminho string Nome do caminho a ser removido
 tuplus.deletarCaminho = function(nome_caminho)
     Caminhos[nome_caminho] = nil
 end
 
 
--- Verifica se um caminho existe
+---Verifica se um caminho existe
+---@param nome_caminho string Nome do caminho a ser verificado
+---@return boolean true se o caminho existe, false caso contrário
 tuplus.existeCaminho = function(nome_caminho)
     return Caminhos[nome_caminho] ~= nil
 end
 
 
--- Inicia a gravação de um caminho para poder ser atualizado
+---Inicia a gravação de um caminho para poder ser atualizado. Caso não exista, cria o caminho.
+---@param nome_caminho string Nome do caminho a ser gravado
 tuplus.gravarCaminho = function(nome_caminho)
     if not tuplus.existeCaminho(nome_caminho) then
         tuplus.novoCaminho(nome_caminho)
@@ -508,7 +587,8 @@ tuplus.gravarCaminho = function(nome_caminho)
 end
 
 
--- Encerra a gravação de um caminho, para que nao possa ser alterado
+---Encerra a gravação de um caminho, para que nao possa ser alterado.
+---@param nome_caminho string Nome do caminho a ser parado
 tuplus.pararGravacaoCaminho = function(nome_caminho)
     if not tuplus.existeCaminho(nome_caminho) then
         return
@@ -517,7 +597,8 @@ tuplus.pararGravacaoCaminho = function(nome_caminho)
 end
 
 
--- Percorre um caminho
+---Percorre um caminho
+---@param nome_caminho string Nome do caminho a ser percorrido
 tuplus.percorrerCaminho = function(nome_caminho)
     local caminho = tuplus.getCaminho(nome_caminho)
     for k, movimento in pairs(caminho.movimentos) do
@@ -526,7 +607,8 @@ tuplus.percorrerCaminho = function(nome_caminho)
 end
 
 
--- Percorre um caminho de tras para frente
+---Percorre um caminho ao contrário. De trás para frente. Desfaz o caminho.
+---@param nome_caminho string Nome do caminho a ser desfeito
 tuplus.desfazerCaminho = function(nome_caminho)
     tuplus.pararGravacaoCaminho(nome_caminho)
     local caminho = tuplus.getCaminho(nome_caminho)
@@ -538,12 +620,15 @@ tuplus.desfazerCaminho = function(nome_caminho)
 end
 
 
--- Limpa o registro de um caminho sem deleta-lo
+---Limpa o registro de um caminho sem deleta-lo
+---@param nome_caminho string Nome do caminho a ser limpo
 tuplus.limparCaminho = function(nome_caminho)
     Caminhos[nome_caminho].movimentos = {}
 end
 
--- Calcula o tamanho de um caminho
+---Calcula o tamanho de um caminho. Útil para saber quanto de combustível é necessário para percorrer o caminho.
+---@param nome_caminho string Nome do caminho a ser calculado
+---@return number Tamanho do caminho
 tuplus.tamanhoCaminho = function(nome_caminho)
     local movimentos = tuplus.getMovimentos(nome_caminho)
 
@@ -564,8 +649,10 @@ tuplus.tamanhoCaminho = function(nome_caminho)
 end
 
 
--- Salva os movimentos de um caminho em um nome_arquivo
--- para que possam ser carregaos eventualmente
+---Salva os movimentos de um caminho em um arquivo
+---para que possam ser carregados eventualmente
+---@param nome_caminho string Nome do caminho a ser salvo
+---@param nome_arquivo string Nome do arquivo onde o caminho será salvo
 tuplus.salvarCaminho = function(nome_caminho, nome_arquivo)
     local caminho = tuplus.getCaminho(nome_caminho)
     local conteudo = textutils.serializeJSON(caminho)
@@ -579,6 +666,10 @@ tuplus.salvarCaminho = function(nome_caminho, nome_arquivo)
     end
 end
 
+---Carrega os movimentos de um caminho salvos em um arquivo. 
+---Cria um caminho novo com os movimentos carregados.
+---@param nome_caminho string Nome do caminho a ser salvo
+---@param nome_arquivo string Nome do arquivo de onde o caminho será carregado
 tuplus.carregarCaminho = function(nome_caminho, nome_arquivo)
     local file = io.open(nome_arquivo, "r")
     if not file then
@@ -592,7 +683,10 @@ tuplus.carregarCaminho = function(nome_caminho, nome_arquivo)
 end
 
 
+------------------------
 -- Funcoes de Inventario
+------------------------
+
 tuplus.search = function(itemName)
     for slot=1, 16 do
         local item = turtle.getItemDetail(slot)
@@ -656,17 +750,13 @@ tuplus.esvaziarInventario = function()
 end
 
 
+-- Dropa itens do inventário
 tuplus.drop = function (options)
-  local direction = "forward"
-  local item_name = nil
-  local quantidade = nil
-  local slot = nil
-  local esvaziar = false
-  if options.direction then direction = options.direction end
-  if options.item_name then item_name = options.item_name end
-  if options.count then quantidade = options.count end
-  if options.slot then slot = options.slot end
-  if options.esvaziar then esvaziar = options.esvaziar end
+  local direction = options.direction or "forward"
+  local item_name = options.item_name or nil
+  local quantidade = options.count or nil
+  local slot = options.slot or nil
+  local esvaziar = options.esvaziar or false
 
   -- Esvaziar inventário
   if esvaziar == true then
@@ -761,7 +851,10 @@ end
 
 
 
+------------------------
 -- Funcoes de construcao
+------------------------
+
 tuplus.place = function()
     canPlace, error = turtle.place()
     while not canPlace do
@@ -807,7 +900,9 @@ tuplus.placeUp = function()
 end
 
 
+-------------------------
 -- Funções de combustivel
+-------------------------
 tuplus.refuelAll = function()
     shell.run('refuel', 'all')
 end
