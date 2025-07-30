@@ -4,6 +4,7 @@
 ]]
 
 local tuplus = {}
+tuplus.__version__ = 1.2
 
 
 -- Imports
@@ -96,7 +97,7 @@ tuplus.saveFacing = function()
     local status = tuplus.getStatus()
     assert(status.facing)
     status.facing = FACING
-    setStatus(status)
+    tuplus.setStatus(status)
 end
 
 
@@ -122,7 +123,7 @@ tuplus.savePosition = function()
     local status = tuplus.getStatus()
     assert(status.position)
     status.position = POSITION
-    setStatus(status)
+    tuplus.setStatus(status)
 end
 
 
@@ -163,7 +164,7 @@ end
 --Orientation
 --Facing orientation
 tuplus.askForDirection = function()
-    local facing = ioutils.askFor(facingToNum, "Set the direction: [n, s, e, w]", "Not a valid direction...")
+    local facing = ioutils.askFor(tuplus.facingToNum, "Set the direction: [n, s, e, w]", "Not a valid direction...")
     return facing
 end
 
@@ -196,6 +197,7 @@ tuplus.orientateFacing = function(option)
         facing_direction = tuplus.askForDirection()
     end
     tuplus.setFacing(facing_direction)
+    tuplus.saveFacing()
 end
 
 
@@ -224,6 +226,7 @@ tuplus.orientatePosition = function(option)
         position = tuplus.askForPosition()
     end
     tuplus.setPosition(position)
+    tuplus.savePosition()
 end
 
 
@@ -603,6 +606,18 @@ tuplus.search = function(itemName)
     return false
 end
 
+-- Encontra o primeiro item que satisfáz o filtro
+tuplus.searchBy = function(filter)
+  for slot=1, 16 do
+    local item = turtle.getItemDetail(slot)
+    if item and filter(item) then
+      turtle.select(slot)
+      return true
+    end
+  end
+  return false
+end
+
 
 tuplus.searchNotEmptySlot = function()
     for slot=1, 16 do
@@ -641,6 +656,70 @@ tuplus.esvaziarInventario = function()
 end
 
 
+tuplus.drop = function (options)
+  local direction = "forward"
+  local item_name = nil
+  local quantidade = nil
+  local slot = nil
+  local esvaziar = false
+  if options.direction then direction = options.direction end
+  if options.item_name then item_name = options.item_name end
+  if options.count then quantidade = options.count end
+  if options.slot then slot = options.slot end
+  if options.esvaziar then esvaziar = options.esvaziar end
+
+  -- Esvaziar inventário
+  if esvaziar == true then
+    return tuplus.esvaziarInventario()
+  end
+
+  local turtle_drop = {["forward"] = turtle.drop, ["down"] = turtle.dropDown, ["up"] = turtle.dropUp}
+
+  -- Dropa quantidade de itens de um slot específico em uma direção
+  if slot then
+    turtle.select(slot)
+    return turtle_drop[direction](quantidade)
+  end
+
+  -- Dropa todos os items com certo nome em uma direção
+  if item_name then
+    local restantes = quantidade
+    -- Encontra de qual slot dropar
+    while tp.search(item_name) and restantes > 0 do
+      -- Encontra quanto dropar
+      local quantidade_slot = turtle.getItemCount()
+      local quantidade_dropar = quantidade_slot -- Por padrão vai dropar tudo no slot
+      if restantes < quantidade then -- Caso reste dropar menos do que o disponível
+        quantidade_dropar = restantes
+      end
+      -- Dropa
+      if turtle_drop[direction](quantidade_dropar) then
+        restantes = restantes - quantidade_dropar
+      end
+    end
+    -- Retorno
+    if restantes <= 0 then
+      return true
+    end
+  end
+
+  return false
+end
+
+-- Retorna quantos itens com esse nome estão no inventário
+tuplus.getQuantidade = function(itemName)
+  local quantidade = 0
+  for i = 1, 16 do
+    local item = turtle.getItemDetail(i)
+    if not item then goto continue end
+    if item.name ~= itemName then goto continue end
+    quantidade = quantidade + item.count
+    ::continue::
+  end
+  return quantidade
+end
+
+
 -- Inspeciona para ver se o bloco da frente eh o desejado
 tuplus.isBlock = function(block_name)
     local _, block = turtle.inspect()
@@ -671,7 +750,7 @@ end
 tuplus.closestPos = function(pos_list)
     local menor_distancia = tuplus.distanceToMe(pos_list[1])
     local closest = pos_list[1]
-    for i,posicao in ipairs(pos_list) do
+    for _,posicao in ipairs(pos_list) do
         if tuplus.distanceToMe(posicao) < menor_distancia then
             menor_distancia = tuplus.distanceToMe(posicao)
             closest = posicao
@@ -699,7 +778,7 @@ end
 
 
 tuplus.placeDown = function()
-    canPlace, error = turtle.placeDown()
+    local canPlace, error = turtle.placeDown()
     while not canPlace do
         if error == "Cannot place block here" then
             return turtle.placeDown()
@@ -714,7 +793,7 @@ end
 
 
 tuplus.placeUp = function()
-    canPlace, error = turtle.placeUp()
+    local canPlace, error = turtle.placeUp()
     while not canPlace do
         if error == "Cannot place block here" then
             return turtle.placeUp()
