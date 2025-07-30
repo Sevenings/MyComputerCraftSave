@@ -6,7 +6,7 @@ local function askFor(condition, inputMsg, errorMsg, sleepTime)
 
     local conditionResult = false
     while not conditionResult do
-        print(inputMsg)
+        write(inputMsg.." ")
         local input = read()
         conditionResult = condition(input)
         if not conditionResult then
