@@ -2,10 +2,6 @@ local rpc = {}
 
 rpc.__version__ = "1.0"
 
----@class Comando
----@field metodo string
----@field parametros table
-
 PROTOCOL = "miner"
 TIMEOUT = 4
 

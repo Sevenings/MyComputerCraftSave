@@ -12,5 +12,6 @@ rpc.host("miner", {
   ["down"] = tp.down,
   ["turnLeft"] = tp.turnLeft,
   ["turnRight"] = tp.turnRight,
+  ["walkTo"] = tp.walkTo,
 })
 
