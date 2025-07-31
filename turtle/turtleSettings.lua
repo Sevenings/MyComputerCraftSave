@@ -38,8 +38,8 @@ local function getPreferences()
     local file = io.open(preferences_filename)
     local content = file:read("*all")
     local preferences = textutils.unserialize(content)
-    if not preferences then 
-        preferences = {} 
+    if not preferences then
+        preferences = {}
         needSave = true
     end
 
