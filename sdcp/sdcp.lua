@@ -26,7 +26,7 @@ end
 
 function createMessage(destination, content)
     local message = {
-        destination = destination,  
+        destination = destination,
         sender = os.computerID(),
         content = content
     }
@@ -39,13 +39,13 @@ local function send(destination, content)
     --senão, tenta enviar diretamente
     local message = createMessage(destination, content)
     local hostId = rednet.lookup(PROTOCOL_NAME)
-    if hostId then  
+    if hostId then
         if type(host) == "table" then
             hostId = hostId[1]
         end
-        rednet.send(hostId, message, PROTOCOL_NAME) 
-    else    
-        rednet.send(destination, message, PROTOCOL_NAME) 
+        rednet.send(hostId, message, PROTOCOL_NAME)
+    else
+        rednet.send(destination, message, PROTOCOL_NAME)
     end
     return receiveConfirmation(destination)
 end
