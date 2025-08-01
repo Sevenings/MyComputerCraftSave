@@ -5,17 +5,16 @@ if #arg >= 1 then
   print("Arguments: "..arg[1])
   if  arg[1] == "-m" then
     tp.orientate("manual")
-  else
-    if tp.canGpsOrientate() then
-        print("GPS orientation available")
-    else
-        print("GPS orientation not available")
-        print("Realizando orientação manual...")
-        print("Going for manual orientation")
-    end
-    tp.orientate()
   end
 end
+
+if tp.canGpsOrientate() then
+    print("GPS orientation available")
+else
+    print("GPS orientation not available")
+    print("Realizando orientação manual...")
+end
+tp.orientate()
 
 
 local position = tp.getPosition():tostring()
