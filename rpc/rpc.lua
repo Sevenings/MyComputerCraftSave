@@ -1,11 +1,26 @@
 local rpc = {}
 
-rpc.__version__ = "1.0"
+rpc.__version__ = "2.0"
 
 PROTOCOL = "miner"
 TIMEOUT = 4
 
+-- Códigos de resposta
+rpc.OK = 0
+rpc.ACK = 1
+rpc.ERRO_TIMEOUT = -1
+rpc.COMANDO_NAO_SUPORTADO = -2
 
+
+local function responder(id_sender, codigo, body)
+  local resposta = {codigo = codigo, body = body}
+  return rednet.send(id_sender, resposta, PROTOCOL)
+end
+
+
+--- Função que retorna uma lista com os nomes dos métodos de uma api
+--- @param api table Tabela que mapeia o nome de um método com sua implementação
+--- @return function get_procedures_list Função que retorna uma lista dos nomes de métodos de sua api
 local function rpc_getProceduresList(api)
   return function ()
     local procedures = {}
@@ -13,6 +28,61 @@ local function rpc_getProceduresList(api)
       table.insert(procedures, k)
     end
     return procedures
+  end
+end
+
+
+---Função que solicita uma chamada de método remoto em um outro computador hosteando um serviço de rpc.
+---@param id_dest number Id do computador de destino
+---@param servico string Nome do serviço que irá receber
+---@param metodo string Nome do método que será chamado
+---@param ... any Lista de argumentos que serão passados para o método
+---@return number status Se mensagem foi recebida com sucesso.
+---   Status =  0 -> OK. Mensagem executada com sucesso.
+---   Status = -1 -> Erro. Timeout excedido. Host não recebeu a mensagem
+---   Status = -2 -> Erro. Método chamado não existe.
+---@return any resultado Resultado da chamada do método
+local function rpc_call(id_dest, servico, metodo, ...)
+  -- Monta o comando a ser enviado
+  local parametros = {...}
+  local comando = {metodo = metodo, parametros = parametros}
+
+  -- Envia o comando para o host
+  rednet.send(id_dest, comando, servico)
+
+  -- Aguarda pelo ACK com um timeout
+  local ack_recebido = false
+  local timeout = TIMEOUT -- segundos
+  repeat
+    local sender, resposta  = rednet.receive(servico, 1)
+    if sender == id_dest and resposta.codigo == rpc.ACK then
+      ack_recebido = true
+    end
+    timeout = timeout - 1
+  until ack_recebido or timeout <= 0
+
+  -- ACK não recebido. Mensagem não foi entregue. Host offline?
+  if not ack_recebido then
+    return rpc.ERRO_TIMEOUT, "Timeout excedido"
+  end
+
+  -- ACK recebido. Mensagem entregue e sendo processada. Aguardando resultado do processamento
+  local sender, resposta
+  repeat
+    sender, resposta = rednet.receive(servico)
+  until sender == id_dest
+
+  -- Retorna a resposta
+  return resposta.codigo, resposta.body
+
+end
+
+
+local function remoteCallFactory(id, servico, nome_metodo)
+  return function (...)
+    local args = {...}
+    local success, resultado = rpc_call(id, servico, nome_metodo, table.unpack(args))
+    return resultado
   end
 end
 
@@ -39,12 +109,11 @@ function rpc.host(service, api)
     if not comando then goto continue end
     print("Recebido: ", textutils.serialise(comando))
 
-
     -- Comando de terminal
     if comando.shell_command then
       print(comando.shell_command)
       local resultado = shell.run(comando.shell_command)
-      rpc.responder(sender, resultado)
+      responder(sender, resultado)
       goto continue
 
     -- Comando da API
@@ -54,62 +123,29 @@ function rpc.host(service, api)
 
       -- Comando não suportado
       if not metodo then
-        rpc.responder(sender, "Erro: Comando nao suportado")
+        responder(sender, rpc.COMANDO_NAO_SUPORTADO, "Erro: Comando nao suportado")
         goto continue
       end
 
+      -- ACK - Retorna que recebeu o comando
+      responder(sender, rpc.ACK)
+
       -- Executa comando
       local resultado = {metodo(table.unpack(args))}
-      if #resultado == 1 then
+      if #resultado == 0 then
+        resultado = nil
+      elseif #resultado == 1 then
         resultado = resultado[1]
       end
-      rpc.responder(sender, resultado)
+      responder(sender, rpc.OK, resultado)
       goto continue
     end
 
     ::continue::
   end
 
-end
+  rednet.unhost(service)
 
-
-function rpc.responder(id_sender, resultado)
-  return rednet.send(id_sender, resultado, PROTOCOL)
-end
-
-
----Função que realiza uma chamada de método remota em um outro computador hosteando um serviço de rpc
----@param id_dest number id do computador de destino
----@param metodo string Nome do método a ser chamado
----@return boolean recebida Se a mensagem foi recebida
----@return boolean|string|number|table|nil resultado
-function rpc.call(id_dest, servico, metodo, ...)
-  -- Monta o comando a ser enviado
-  local parametros = {...}
-  local comando = {metodo = metodo, parametros = parametros}
-
-  -- Envia para o host
-  rednet.send(id_dest, comando, servico)
-
-  -- Aguarda por uma resposta
-  local timeout = TIMEOUT -- segundos
-  while timeout > 0 do
-    local sender, resposta  = rednet.receive(servico, 1)
-    if sender == id_dest then
-      return true, resposta
-    end
-    timeout = timeout - 1
-  end
-  return false, nil
-end
-
-
-local function remoteCallFactory(id, servico, nome_metodo)
-  return function (...)
-    local args = {...}
-    local success, resultado = rpc.call(id, servico, nome_metodo, table.unpack(args))
-    return resultado
-  end
 end
 
 
@@ -122,13 +158,15 @@ function rpc.Proxy(id, servico)
   peripheral.find("modem", rednet.open)
 
   -- Buscar os métodos disponíveis
-  local success, lista_metodos = rpc.call(id, servico, "__rpc.getProceduresList")
+  local success, lista_metodos = rpc_call(id, servico, "__rpc.getProceduresList")
   if not success then
     error("Erro: Host não responde")
   end
 
   -- Criar o proxy
-  local proxy = {}
+  local proxy = {id=id}
+  local proxy_mt = {__tostring = function () return string.format("%s<%d>", servico, id) end}
+  setmetatable(proxy, proxy_mt)
   for _, nome_metodo in pairs(lista_metodos) do
     proxy[nome_metodo] = remoteCallFactory(id, servico, nome_metodo)
   end
