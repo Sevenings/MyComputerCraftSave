@@ -1,8 +1,6 @@
 local rpc = require 'rpc'
 local tp = require 'tuplus'
 
-SERVICE = "miner"
-
 rpc.host("miner", {
   ["getPosition"] = tp.getPosition,
   ["getFacing"] = tp.getFacing,
@@ -13,5 +11,15 @@ rpc.host("miner", {
   ["turnLeft"] = tp.turnLeft,
   ["turnRight"] = tp.turnRight,
   ["walkTo"] = tp.walkTo,
+  ["turnTo"] = tp.turnTo,
+  ["orientate"] = tp.orientate,
+  ["distanceTo"] = tp.distanceTo,
+  ["dig"] = turtle.dig,
+  ["digUp"] = turtle.digUp,
+  ["digDown"] = turtle.digDown,
+  ["tryDig"] = tp.tryDig,
+  ["tryDigUp"] = tp.tryDigUp,
+  ["tryDigDown"] = tp.tryDigDown,
+  ["shell"] = shell.run,
 })
 
